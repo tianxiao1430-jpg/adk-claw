@@ -57,6 +57,12 @@ def print_status():
 def main():
     """主函数"""
     import argparse
+    import os
+
+    # 注入 API Key 到环境变量，供底层的 google-genai 或其他 SDK 使用
+    google_key = config.get_google_api_key()
+    if google_key:
+        os.environ["GEMINI_API_KEY"] = google_key
 
     parser = argparse.ArgumentParser(description="ADK Claw")
     parser.add_argument("--web", action="store_true", help="启动 Web UI")
