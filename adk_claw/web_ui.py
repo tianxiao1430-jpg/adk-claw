@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
-from config import config
+from .config import config
 
 app = FastAPI(title="ADK Claw")
 

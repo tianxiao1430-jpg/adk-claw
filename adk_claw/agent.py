@@ -1,7 +1,7 @@
 """
 ADK Claw - Agent 定义
 ====================
-基于 Google ADK 的 Slack AI Agent
+基于 Google ADK 的 AI Agent
 """
 
 import os
@@ -9,9 +9,9 @@ from google.adk.agents import LlmAgent
 from google.adk.tools import FunctionTool
 
 try:
-    from config import config
+    from .config import config
     MODEL = config.get_model()
-except:
+except ImportError:
     MODEL = os.environ.get("ADK_MODEL", "gemini-2.5-flash")
 
 
@@ -36,57 +36,57 @@ def echo_message(message: str) -> str:
 
 def remember(content: str, source: str = "fact") -> str:
     """记住重要信息
-    
+
     Args:
         content: 要记住的内容
         source: 来源类型（fact/preference/note）
-    
+
     Returns:
         确认消息
     """
-    from memory import memory_manager
+    from .memory import memory_manager
     entry = memory_manager.remember(content, source=source)
     return f"✅ 已记住：{content}"
 
 
 def recall(query: str, limit: int = 5) -> str:
     """回忆相关信息
-    
+
     Args:
         query: 搜索关键词
         limit: 返回数量
-    
+
     Returns:
         相关记忆
     """
-    from memory import memory_manager
+    from .memory import memory_manager
     results = memory_manager.search(query, limit=limit)
-    
+
     if not results:
         return "没有找到相关记忆"
-    
+
     lines = ["📚 相关记忆："]
     for r in results:
         lines.append(f"- {r.entry.content}")
-    
+
     return "\n".join(lines)
 
 
 def forget(content_pattern: str) -> str:
     """忘记特定记忆
-    
+
     Args:
         content_pattern: 要忘记的内容模式
-    
+
     Returns:
         确认消息
     """
-    from memory import memory_manager
+    from .memory import memory_manager
     results = memory_manager.search(content_pattern, limit=1)
-    
+
     if not results:
         return "没有找到匹配的记忆"
-    
+
     entry = results[0].entry
     memory_manager.forget(entry.id)
     return f"✅ 已忘记：{entry.content}"
@@ -94,24 +94,24 @@ def forget(content_pattern: str) -> str:
 
 def get_memory_stats() -> str:
     """获取记忆统计
-    
+
     Returns:
         记忆统计信息
     """
-    from memory import memory_manager
+    from .memory import memory_manager
     stats = memory_manager.stats()
-    
+
     lines = [
         f"📊 记忆统计：",
         f"- 总条目：{stats.total_entries}",
     ]
-    
+
     for source, count in stats.by_source.items():
         lines.append(f"- {source}: {count}")
-    
+
     if stats.last_sync:
         lines.append(f"- 最后同步：{stats.last_sync}")
-    
+
     return "\n".join(lines)
 
 

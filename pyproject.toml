@@ -30,6 +30,7 @@ dependencies = [
     "python-telegram-bot>=20.0",
     "fastapi>=0.104.0",
     "uvicorn>=0.24.0",
+    "websockets>=12.0",
     "jinja2>=3.1.0",
     "python-multipart>=0.0.6",
     "click>=8.1.0",
@@ -46,17 +47,17 @@ dev = [
 ]
 
 [project.scripts]
-adk-claw = "cli:cli"
+adk-claw = "adk_claw.cli:cli"
 
 [project.urls]
-Homepage = "https://github.com/tianxiao/adk-claw"
-Documentation = "https://github.com/tianxiao/adk-claw#readme"
-Repository = "https://github.com/tianxiao/adk-claw"
-Issues = "https://github.com/tianxiao/adk-claw/issues"
+Homepage = "https://github.com/tianxiao1430-jpg/adk-claw"
+Documentation = "https://github.com/tianxiao1430-jpg/adk-claw#readme"
+Repository = "https://github.com/tianxiao1430-jpg/adk-claw"
+Issues = "https://github.com/tianxiao1430-jpg/adk-claw/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["*.py"]
+include = ["adk_claw*"]
 
 [tool.black]
 line-length = 88

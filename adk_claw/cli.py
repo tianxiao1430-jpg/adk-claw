@@ -113,7 +113,6 @@ def init(non_interactive: bool):
     console.print(Panel.fit(
         "[green]✅ 初始化完成！[/green]\n\n"
         "[cyan]下一步：[/cyan]\n"
-        "  [bold]adk-claw gateway[/bold]        启动网关（推荐）\n"
         "  [bold]adk-claw run --web[/bold]      启动 Web UI\n"
         "  [bold]adk-claw run --telegram[/bold] 启动 Telegram Bot",
         title="🎉 安装成功",
@@ -131,7 +130,7 @@ def config(section: str):
 
 def run_config_wizard(section: str = "all"):
     """运行配置向导"""
-    from config import config as app_config
+    from .config import config as app_config
 
     # API Keys
     if section in ["api", "all"]:
@@ -230,8 +229,8 @@ def run_config_wizard(section: str = "all"):
 @click.option("--all", "all_services", is_flag=True, help="启动所有服务")
 @click.option("--port", default=8080, help="Web UI 端口")
 def run(web: bool, slack: bool, telegram: bool, all_services: bool, port: int):
-    """启动服务（旧方式，直接启动各渠道）"""
-    from main import main as run_main
+    """启动服务"""
+    from .main import main as run_main
 
     # 构建参数
     args = []
@@ -254,80 +253,12 @@ def run(web: bool, slack: bool, telegram: bool, all_services: bool, port: int):
 
 
 @cli.command()
-@click.option("--host", default="0.0.0.0", help="网关监听地址")
-@click.option("--port", default=19001, help="网关端口")
-@click.option("--web-port", default=8080, help="Web UI 端口")
-@click.option("--config", "config_path", help="配置文件路径")
-@click.option("--daemon", is_flag=True, help="后台运行")
-def gateway(host: str, port: int, web_port: int, config_path: Optional[str], daemon: bool):
-    """启动网关（类似 openclaw gateway）"""
-    print_banner()
-    console.print()
-
-    from config import config as app_config
-
-    # 检查配置
-    has_api = bool(app_config.get_google_api_key())
-    if not has_api:
-        console.print("[red]❌ 请先配置 API Key: adk-claw config[/red]")
-        sys.exit(1)
-
-    console.print("[bold]🚀 启动网关...[/bold]")
-    console.print(f"   地址: [cyan]{host}:{port}[/cyan]")
-    console.print(f"   Web UI: [cyan]http://localhost:{web_port}[/cyan]")
-    console.print()
-
-    async def run_gateway():
-        from gateway import Gateway, ChannelType
-        from gateway.adapters import TelegramAdapter, WebAdapter
-
-        # 创建网关
-        gw = Gateway(config_path)
-
-        # 注册适配器
-        if app_config.is_telegram_enabled():
-            telegram = TelegramAdapter(gw, app_config.get_telegram_token())
-            gw.register_adapter(ChannelType.TELEGRAM, telegram)
-            console.print("[green]✅ Telegram 已连接[/green]")
-
-        # 注册 Web 适配器
-        web = WebAdapter(gw, host=host, port=web_port)
-        gw.register_adapter(ChannelType.WEB, web)
-        console.print(f"[green]✅ Web UI 已启动: http://localhost:{web_port}[/green]")
-
-        # 启动所有适配器
-        for channel, adapter in gw.adapters.items():
-            await adapter.start()
-
-        console.print()
-        console.print(Panel.fit(
-            "[green]✅ 网关运行中[/green]\n\n"
-            "[dim]按 Ctrl+C 停止[/dim]",
-            border_style="green"
-        ))
-
-        # 保持运行
-        try:
-            while True:
-                await asyncio.sleep(1)
-        except KeyboardInterrupt:
-            console.print("\n[yellow]正在停止...[/yellow]")
-            for adapter in gw.adapters.values():
-                await adapter.stop()
-
-    try:
-        asyncio.run(run_gateway())
-    except KeyboardInterrupt:
-        console.print("[green]👋 再见！[/green]")
-
-
-@cli.command()
 def doctor():
     """健康检查（类似 openclaw doctor）"""
     print_banner()
     console.print()
 
-    from config import config as app_config
+    from .config import config as app_config
 
     issues = []
 
@@ -387,7 +318,8 @@ def doctor():
 @cli.command()
 def version():
     """显示版本"""
-    console.print("[bold cyan]ADK Claw[/bold cyan] v0.1.0")
+    from . import __version__
+    console.print(f"[bold cyan]ADK Claw[/bold cyan] v{__version__}")
 
 
 # ============================================
