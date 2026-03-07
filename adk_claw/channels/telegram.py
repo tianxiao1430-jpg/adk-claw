@@ -142,8 +142,21 @@ class TelegramChannel(ChannelHandler):
 
 
 # ========================================
-# 快捷函数
+# 工厂函数
 # ========================================
+
+def create_telegram_channel(agent, token: str) -> TelegramChannel:
+    """创建 Telegram 渠道实例
+    
+    Args:
+        agent: ADK Agent 实例
+        token: Telegram Bot Token
+        
+    Returns:
+        TelegramChannel 实例
+    """
+    return TelegramChannel(agent, token)
+
 
 async def start_telegram_bot(agent, token: str):
     """启动 Telegram Bot（快捷方式）
@@ -151,7 +164,10 @@ async def start_telegram_bot(agent, token: str):
     Args:
         agent: ADK Agent 实例
         token: Telegram Bot Token
+        
+    Returns:
+        TelegramChannel 实例
     """
-    channel = TelegramChannel(agent, token)
+    channel = create_telegram_channel(agent, token)
     await channel.start()
     return channel
