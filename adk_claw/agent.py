@@ -143,7 +143,25 @@ def web_search(query: str, limit: int = 5) -> str:
     except Exception as e:
         return f"搜索失败: {str(e)}"
 
+
+# ============================================
+# Google Workspace 工具（ADK 内置）
+# ============================================
+
+def _load_google_workspace_toolsets():
+    """加载 ADK 内置的 Google Workspace 工具集"""
+    try:
+        from .tools.adk_google_workspace import create_all_google_workspace_toolsets
+        return create_all_google_workspace_toolsets()
+    except ImportError:
+        return []
+
+
+# ============================================
 # 注册工具
+# ============================================
+
+# 基础工具
 TOOLS = [
     FunctionTool(func=web_search),
     FunctionTool(func=get_current_time),
@@ -153,6 +171,10 @@ TOOLS = [
     FunctionTool(func=forget),
     FunctionTool(func=get_memory_stats),
 ]
+
+# 添加 ADK 内置 Google Workspace 工具集
+google_workspace_toolsets = _load_google_workspace_toolsets()
+TOOLS.extend(google_workspace_toolsets)
 
 
 # ============================================
@@ -193,17 +215,21 @@ def get_system_instruction(channel: str = "telegram") -> str:
 
     base_prompt = build_system_prompt()
 
+    # 检查 Google Workspace 工具集状态
+    google_workspace_status = "已启用" if google_workspace_toolsets else "未配置"
+
     # 添加工具说明
-    tools_prompt = """
+    tools_prompt = f"""
 
 ## 可用工具 (Tools)
 
-你可以使用以下工具：
-
+### 基础工具
 - **get_current_time**: 获取当前时间
-- **web_search**: 通过 DuckDuckGo 搜索网络获取实时信息（天气、新闻、百科等）
+- **web_search**: 通过 DuckDuckGo 搜索网络获取实时信息
   - 用法：web_search(query, limit=5)
-  - 核心指令：当你遇到自己不知道、未训练过、或需要最新数据的提问时（如明天天气、最新新闻），**必须**立即使用此工具。
+  - 核心指令：遇到需要最新数据的问题时**必须**使用此工具
+
+### 记忆工具
 - **remember**: 记住重要信息
   - 用法：remember(content, source)
   - source: "fact" | "preference" | "note"
@@ -213,12 +239,28 @@ def get_system_instruction(channel: str = "telegram") -> str:
   - 用法：forget(content_pattern)
 - **get_memory_stats**: 获取记忆统计
 
+### Google Workspace 工具 ({google_workspace_status})
+
+使用 ADK 内置的 GoogleApiToolset，支持：
+- **Gmail**: 邮件发送、列表、搜索、草稿
+- **Calendar**: 事件列表、创建、更新、删除
+- **Sheets**: 单元格读写、追加、创建表格
+- **Docs**: 文档读取、创建
+
+工具会根据 OAuth 配置自动启用。
+
 ## 记忆策略
 
-- 用户偏好 → 使用 `remember(source="preference")`
-- 重要事实 → 使用 `remember(source="fact")`
-- 临时笔记 → 使用 `remember(source="note")`
-- 需要回忆时 → 使用 `recall()`
+- 用户偏好 → remember(source="preference")
+- 重要事实 → remember(source="fact")
+- 临时笔记 → remember(source="note")
+- 需要回忆时 → recall()
+
+## 工具使用原则
+
+1. **网络搜索**：遇到需要最新数据的问题（天气、新闻、股价），**必须**使用 web_search
+2. **Google Workspace**：用户请求邮件/日历/文件操作时，**主动**使用相应工具
+3. **确认操作**：执行敏感操作（发送邮件、删除文件）前，**先确认**用户意图
 """
 
     # 添加内部思考标签说明
@@ -238,12 +280,6 @@ def get_system_instruction(channel: str = "telegram") -> str:
 ```
 
 `<internal>` 标签内的内容会被记录到日志但**不会发送给用户**。
-
-用途：
-- 记录推理过程
-- 调试信息
-- 中间结果（已通过 send_message 发送的内容）
-- 敏感信息（记录但不展示）
 """
 
     # 组合基础提示词
@@ -296,8 +332,7 @@ root_agent = adk_claw_agent
 
 if __name__ == "__main__":
     print("ADK Claw Agent 已定义")
-    print(f"工具数量: {len(TOOLS)}")
+    print(f"基础工具数量: {len(TOOLS) - len(google_workspace_toolsets)}")
+    print(f"Google Workspace 工具集: {len(google_workspace_toolsets)} 个")
+    print(f"总工具数量: {len(TOOLS)}")
     print("\n支持的渠道：telegram, slack, discord, web, whatsapp, console")
-    print("\n系统提示词预览（Telegram）：")
-    print("=" * 60)
-    print(get_system_instruction("telegram")[:800] + "...")
