@@ -5,7 +5,6 @@ ADK Claw - 主入口
 
 import os
 import sys
-import asyncio
 import threading
 import time
 from pathlib import Path
@@ -55,7 +54,7 @@ def print_status():
     print()
 
 
-async def main():
+def main():
     """主函数"""
     import argparse
 
@@ -107,16 +106,16 @@ async def main():
         else:
             print("⚠️  Slack 未配置，跳过")
 
-    # Telegram
+    # Telegram（阻塞模式）
     if args.telegram or args.all:
         token = config.get_telegram_token()
         if token:
+            from telegram import Update
             from .telegram_handler import start_telegram
             app = start_telegram(token)
             if app:
                 print("📱 Telegram Bot 已启动")
-                # Telegram 需要在主线程运行
-                from telegram import Update
+                # Telegram 在主线程运行（阻塞）
                 app.run_polling(allowed_updates=Update.ALL_TYPES)
         else:
             print("⚠️  Telegram 未配置，跳过")
@@ -133,4 +132,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

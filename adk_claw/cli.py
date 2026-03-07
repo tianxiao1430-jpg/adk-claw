@@ -5,15 +5,13 @@ ADK Claw - CLI 入口
 类似 OpenClaw 的安装体验：
 - adk-claw init    # 初始化配置
 - adk-claw config  # 配置向导
-- adk-claw run     # 启动服务（旧方式）
-- adk-claw gateway # 启动网关（新方式）
+- adk-claw run     # 启动服务
 - adk-claw doctor  # 健康检查
 """
 
 import os
 import sys
 import subprocess
-import asyncio
 from pathlib import Path
 from typing import Optional
 
@@ -247,9 +245,9 @@ def run(web: bool, slack: bool, telegram: bool, all_services: bool, port: int):
     if not args:
         args = ["--web"]
 
-    # 调用 main.py
+    # 调用 main.py（同步调用，不用 asyncio）
     sys.argv = ["main.py"] + args
-    asyncio.run(run_main())
+    run_main()
 
 
 @cli.command()
