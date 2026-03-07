@@ -62,7 +62,7 @@ class SlackChannel(ChannelHandler):
             )
             
             # 提取内部内容
-            final_response = extract_internal_content(response)
+            _, final_response = extract_internal_content(response)
             
             # 发送响应
             try:

@@ -112,7 +112,7 @@ class TelegramChannel(ChannelHandler):
         response = await self.handle_message(user_id, text)
         
         # 提取内部内容（不发送给用户）
-        final_response = extract_internal_content(response)
+        _, final_response = extract_internal_content(response)
         
         # 发送响应
         await update.message.reply_text(final_response)
@@ -136,7 +136,7 @@ class TelegramChannel(ChannelHandler):
         )
         
         response = await self.run_agent(user_id, text, images=[photo_url])
-        final_response = extract_internal_content(response)
+        _, final_response = extract_internal_content(response)
         
         await update.message.reply_text(final_response)
 

@@ -51,7 +51,7 @@ class WebChannel(ChannelHandler):
             response = await self.handle_message(user_id, text)
             
             # 提取内部内容
-            final_response = extract_internal_content(response)
+            _, final_response = extract_internal_content(response)
             
             return {"response": final_response}
         
