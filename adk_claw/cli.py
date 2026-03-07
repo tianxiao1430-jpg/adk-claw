@@ -173,7 +173,7 @@ def run_config_wizard(section: str = "all"):
         console.print(f"Telegram: {status}")
 
         if Confirm.ask("配置 Telegram？", default=not telegram_enabled):
-            token = Prompt.ask("Telegram Bot Token", password=True)
+            token = Prompt.ask("Telegram Bot Token")
             if token:
                 app_config.set_telegram_token(token)
                 console.print("[green]✅ Telegram 已配置[/green]")
@@ -184,8 +184,8 @@ def run_config_wizard(section: str = "all"):
         console.print(f"Slack: {status}")
 
         if Confirm.ask("配置 Slack？", default=False):
-            bot_token = Prompt.ask("Slack Bot Token (xoxb-...)", password=True)
-            app_token = Prompt.ask("Slack App Token (xapp-...)", password=True)
+            bot_token = Prompt.ask("Slack Bot Token (xoxb-...)")
+            app_token = Prompt.ask("Slack App Token (xapp-...)")
             if bot_token and app_token:
                 app_config.set_slack_tokens(bot_token, app_token)
                 console.print("[green]✅ Slack 已配置[/green]")
