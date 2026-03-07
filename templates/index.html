@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADK Claw 🦞</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 1.3em;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.missing { background: #f8d7da; color: #721c24; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦞 ADK Claw</h1>
+        
+        <!-- 模型配置 -->
+        <div class="card">
+            <h2>🤖 模型配置</h2>
+            <form action="/api/model" method="post">
+                <div class="form-group">
+                    <label>选择模型</label>
+                    <select name="model" style="width:100%;padding:12px;border-radius:8px;">
+                        <option value="gemini-2.5-flash" {% if config.model == "gemini-2.5-flash" %}selected{% endif %}>Gemini 2.5 Flash（推荐）</option>
+                        <option value="openai/gpt-4o" {% if config.model == "openai/gpt-4o" %}selected{% endif %}>GPT-4o</option>
+                        <option value="anthropic/claude-3.5-sonnet" {% if config.model == "anthropic/claude-3.5-sonnet" %}selected{% endif %}>Claude 3.5 Sonnet</option>
+                        <option value="deepseek/deepseek-chat" {% if config.model == "deepseek/deepseek-chat" %}selected{% endif %}>DeepSeek</option>
+                    </select>
+                </div>
+                <button type="submit">保存</button>
+            </form>
+        </div>
+        
+        <!-- API Keys -->
+        <div class="card">
+            <h2>🔑 API Keys</h2>
+            <div class="grid">
+                <div>
+                    <form action="/api/google-key" method="post">
+                        <div class="form-group">
+                            <label>Google API Key <span class="status {% if has_google_key %}ok{% else %}missing{% endif %}">{% if has_google_key %}已配置{% else %}未配置{% endif %}</span></label>
+                            <input type="password" name="api_key" placeholder="AIza...">
+                        </div>
+                        <button type="submit">保存</button>
+                    </form>
+                </div>
+                <div>
+                    <form action="/api/openai-key" method="post">
+                        <div class="form-group">
+                            <label>OpenAI API Key <span class="status {% if has_openai_key %}ok{% else %}missing{% endif %}">{% if has_openai_key %}已配置{% else %}未配置{% endif %}</span></label>
+                            <input type="password" name="api_key" placeholder="sk-...">
+                        </div>
+                        <button type="submit">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slack 配置 -->
+        <div class="card">
+            <h2>💬 Slack <span class="status {% if slack_enabled %}ok{% else %}missing{% endif %}">{% if slack_enabled %}已启用{% else %}未启用{% endif %}</span></h2>
+            <form action="/api/slack" method="post">
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Bot Token (xoxb-...)</label>
+                        <input type="password" name="bot_token" placeholder="xoxb-...">
+                    </div>
+                    <div class="form-group">
+                        <label>App Token (xapp-...)</label>
+                        <input type="password" name="app_token" placeholder="xapp-...">
+                    </div>
+                </div>
+                <button type="submit">保存并启用</button>
+            </form>
+        </div>
+        
+        <!-- Telegram 配置 -->
+        <div class="card">
+            <h2>📱 Telegram <span class="status {% if telegram_enabled %}ok{% else %}missing{% endif %}">{% if telegram_enabled %}已启用{% else %}未启用{% endif %}</span></h2>
+            <form action="/api/telegram" method="post">
+                <div class="form-group">
+                    <label>Bot Token (从 @BotFather 获取)</label>
+                    <input type="password" name="token" placeholder="123456:ABC...">
+                </div>
+                <button type="submit">保存并启用</button>
+            </form>
+            <p style="margin-top:12px;color:#666;font-size:13px;">
+                💡 获取 Token: Telegram 搜索 @BotFather → /newbot
+            </p>
+        </div>
+        
+        <!-- Google OAuth -->
+        <div class="card">
+            <h2>🔐 Google OAuth（可选）</h2>
+            <p style="color:#666;margin-bottom:16px;font-size:13px;">
+                用于访问 Gmail、Calendar、Drive 等需要用户授权的服务
+            </p>
+            <form action="/api/google-oauth" method="post">
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Client ID</label>
+                        <input type="text" name="client_id" placeholder="xxx.apps.googleusercontent.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Client Secret</label>
+                        <input type="password" name="client_secret" placeholder="GOCSPX-...">
+                    </div>
+                </div>
+                <button type="submit">保存</button>
+            </form>
+            <p style="margin-top:12px;color:#666;font-size:13px;">
+                💡 创建 OAuth 凭证: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>
+            </p>
+        </div>
+        
+        <!-- 状态 -->
+        <div class="card">
+            <h2>📊 状态</h2>
+            <div style="font-family:monospace;background:#f5f5f5;padding:12px;border-radius:8px;">
+                <p>✅ 配置目录: ~/.adk-claw/</p>
+                <p>🤖 模型: {{ config.model }}</p>
+                <p>💬 Slack: {% if slack_enabled %}✅ 已连接{% else %}❌ 未配置{% endif %}</p>
+                <p>📱 Telegram: {% if telegram_enabled %}✅ 已连接{% else %}❌ 未配置{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
