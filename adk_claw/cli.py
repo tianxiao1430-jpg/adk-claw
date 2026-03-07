@@ -72,15 +72,31 @@ def check_dependencies():
 # ============================================
 
 AVAILABLE_MODELS = {
-    "Gemini (Google)": [
-        ("gemini-2.5-flash-preview", "⚡ 最新！快速高效（推荐）"),
-        ("gemini-2.5-pro-preview", "🧠 最新！最强推理能力"),
-        ("gemini-2.0-flash", "🚀 稳定版，快速响应"),
-        ("gemini-2.0-flash-lite-preview", "💨 轻量版，极速响应"),
-        ("gemini-2.0-pro-exp", "🔬 实验版，前沿功能"),
-        ("gemini-1.5-flash", "📦 经典版，稳定可靠"),
-        ("gemini-1.5-flash-8b", "📦 经济版，成本优化"),
-        ("gemini-1.5-pro", "📦 经典版，强大能力"),
+    "Gemini 3.1 (最新)": [
+        ("gemini-3.1-pro", "🧠 最强智能，复杂问题，代码生成"),
+        ("gemini-3.1-flash-lite", "⚡ 极低成本，高性能"),
+    ],
+    "Gemini 3 (预览版)": [
+        ("gemini-3-pro", "🔬 最先进多模态理解"),
+        ("gemini-3-flash", "⚡ 极低成本卓越性能"),
+    ],
+    "Nano Banana (轻量)": [
+        ("nano-banana-2", "🍌 高速大容量"),
+        ("nano-banana-pro", "🍌 复杂任务支持"),
+    ],
+    "Gemini 2.5 (稳定版)": [
+        ("gemini-2.5-flash-preview", "⚡ 快速高效（推荐）"),
+        ("gemini-2.5-pro-preview", "🧠 最强推理能力"),
+    ],
+    "Gemini 2.0": [
+        ("gemini-2.0-flash", "🚀 稳定快速响应"),
+        ("gemini-2.0-flash-lite-preview", "💨 轻量版极速响应"),
+        ("gemini-2.0-pro-exp", "🔬 实验版前沿功能"),
+    ],
+    "Gemini 1.5 (经典)": [
+        ("gemini-1.5-flash", "📦 稳定可靠"),
+        ("gemini-1.5-flash-8b", "📦 经济版成本优化"),
+        ("gemini-1.5-pro", "📦 经典强大能力"),
     ],
     "GPT (OpenAI)": [
         ("openai/gpt-4.1", "🆕 最新 GPT-4.1"),
