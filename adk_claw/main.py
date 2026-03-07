@@ -5,6 +5,8 @@ ADK Claw - 主入口
 
 import os
 import sys
+import time
+
 import logging
 from pathlib import Path
 
