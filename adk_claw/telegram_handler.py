@@ -7,7 +7,8 @@ import asyncio
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-from .agent import adk_claw_agent
+from .agent import create_agent
+from .formats import extract_internal_content
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
@@ -19,9 +20,12 @@ from google.genai import types
 
 session_service = InMemorySessionService()
 
+# 为 Telegram 创建专用的 Agent
+telegram_agent = create_agent(channel="telegram")
+
 runner = Runner(
     app_name="adk-claw",
-    agent=adk_claw_agent,
+    agent=telegram_agent,
     session_service=session_service,
 )
 
@@ -118,8 +122,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 运行 Agent
     response = await run_agent(user_id, message)
 
-    # 发送回复
-    await update.message.reply_text(response)
+    # 提取 internal 内容和可见内容
+    internal_content, visible_content = extract_internal_content(response)
+
+    # 记录 internal 内容到日志
+    if internal_content:
+        print(f"[Internal] {internal_content}")
+
+    # 发送可见内容给用户
+    if visible_content:
+        await update.message.reply_text(visible_content)
+    else:
+        # 如果没有可见内容，发送默认回复
+        await update.message.reply_text("任务已完成。")
 
 
 # ============================================

@@ -150,14 +150,22 @@ def get_model():
 # Agent 定义
 # ============================================
 
-def get_system_instruction() -> str:
-    """构建系统提示词"""
+def get_system_instruction(channel: str = "telegram") -> str:
+    """构建系统提示词（支持动态格式注入）
+
+    Args:
+        channel: 渠道名称（telegram, slack, discord, web, whatsapp）
+
+    Returns:
+        完整的系统提示词
+    """
     from .prompts import build_system_prompt
+    from .formats import get_format_prompt, inject_format_prompt
 
     base_prompt = build_system_prompt()
 
     # 添加工具说明
-    tools_prompt = f"""
+    tools_prompt = """
 
 ## 可用工具 (Tools)
 
@@ -181,13 +189,63 @@ def get_system_instruction() -> str:
 - 需要回忆时 → 使用 `recall()`
 """
 
-    return base_prompt + tools_prompt
+    # 添加内部思考标签说明
+    internal_prompt = """
+
+## 内部思考 (Internal Thoughts)
+
+如果部分输出是你的内部推理过程而非给用户的内容，使用 `<internal>` 标签：
+
+```
+<internal>
+你的内部思考过程...
+分析步骤、决策逻辑、调试信息等...
+</internal>
+
+给用户的实际回复...
+```
+
+`<internal>` 标签内的内容会被记录到日志但**不会发送给用户**。
+
+用途：
+- 记录推理过程
+- 调试信息
+- 中间结果（已通过 send_message 发送的内容）
+- 敏感信息（记录但不展示）
+"""
+
+    # 组合基础提示词
+    full_prompt = base_prompt + tools_prompt + internal_prompt
+
+    # 动态注入格式规范
+    full_prompt = inject_format_prompt(full_prompt, channel)
+
+    return full_prompt
 
 
+def create_agent(channel: str = "telegram") -> LlmAgent:
+    """创建 Agent 实例（支持渠道适配）
+
+    Args:
+        channel: 渠道名称
+
+    Returns:
+        配置好的 Agent 实例
+    """
+    return LlmAgent(
+        name="adk_claw",
+        model=get_model(),
+        instruction=get_system_instruction(channel),
+        description="ADK Claw - 智能办公助手",
+        tools=TOOLS,
+    )
+
+
+# 默认 Agent（向后兼容）
 adk_claw_agent = LlmAgent(
     name="adk_claw",
     model=get_model(),
-    instruction=get_system_instruction(),
+    instruction=get_system_instruction("telegram"),
     description="ADK Claw - 智能办公助手",
     tools=TOOLS,
 )
@@ -203,6 +261,7 @@ root_agent = adk_claw_agent
 if __name__ == "__main__":
     print("ADK Claw Agent 已定义")
     print(f"工具数量: {len(TOOLS)}")
-    print("\n系统提示词预览：")
+    print("\n支持的渠道：telegram, slack, discord, web, whatsapp, console")
+    print("\n系统提示词预览（Telegram）：")
     print("=" * 60)
-    print(get_system_instruction()[:500] + "...")
+    print(get_system_instruction("telegram")[:800] + "...")

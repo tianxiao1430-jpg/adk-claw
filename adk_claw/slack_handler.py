@@ -10,7 +10,8 @@ import asyncio
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from .agent import adk_claw_agent
+from .agent import create_agent
+from .formats import extract_internal_content
 from .config import config
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
@@ -23,9 +24,12 @@ from google.genai import types
 
 session_service = InMemorySessionService()
 
+# 为 Slack 创建专用的 Agent
+slack_agent = create_agent(channel="slack")
+
 runner = Runner(
     app_name="adk-claw",
-    agent=adk_claw_agent,
+    agent=slack_agent,
     session_service=session_service,
 )
 
@@ -117,8 +121,14 @@ def init_app():
         # 运行 Agent
         response = await run_agent(user, text)
 
+        # 提取 internal 内容
+        internal_content, visible_content = extract_internal_content(response)
+
+        if internal_content:
+            print(f"[Internal] {internal_content}")
+
         # 回复
-        await say(response)
+        await say(visible_content or "任务已完成。")
 
     @app.event("message")
     async def handle_message(event, say):
@@ -135,8 +145,14 @@ def init_app():
         # 运行 Agent
         response = await run_agent(user, text)
 
+        # 提取 internal 内容
+        internal_content, visible_content = extract_internal_content(response)
+
+        if internal_content:
+            print(f"[Internal] {internal_content}")
+
         # 回复
-        await say(response)
+        await say(visible_content or "任务已完成。")
 
     return True
 
