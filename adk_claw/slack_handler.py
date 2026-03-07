@@ -40,17 +40,17 @@ user_sessions = {}
 async def get_or_create_session(user_id: str) -> str:
     """获取或创建用户会话"""
     if user_id not in user_sessions:
-        result = session_service.create_session(
+        session = await session_service.create_session(
             app_name="adk-claw",
             user_id=user_id,
             state={}
         )
 
-        # 兼容两种返回类型
-        if hasattr(result, 'id'):
-            session_id = result.id
+        # 获取 session id
+        if hasattr(session, 'id'):
+            session_id = session.id
         else:
-            session_id = str(result)
+            session_id = str(session)
 
         user_sessions[user_id] = session_id
         return session_id
