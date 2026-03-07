@@ -161,7 +161,7 @@ adk-claw config --section model
 
 支持的模型：
 - `gemini-3.1-flash`（推荐，免费）
-- `gemini-3.1-flash-lite`（极低成本）
+- `gemini-3.1-flash-lite-preview`（极低成本）
 - `gemini-3.1-pro`
 - `gpt-4o`
 - `claude-3-5-sonnet`

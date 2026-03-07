@@ -91,7 +91,7 @@
                     <label>选择模型</label>
                     <select name="model" style="width:100%;padding:12px;border-radius:8px;">
                         <option value="gemini-3.1-flash" {% if config.model == "gemini-3.1-flash" %}selected{% endif %}>Gemini 3.1 Flash（推荐）</option>
-                        <option value="gemini-3.1-flash-lite" {% if config.model == "gemini-3.1-flash-lite" %}selected{% endif %}>Gemini 3.1 Flash Lite（极低成本）</option>
+                        <option value="gemini-3.1-flash-lite-preview" {% if config.model == "gemini-3.1-flash-lite-preview" %}selected{% endif %}>Gemini 3.1 Flash Lite（极低成本）</option>
                         <option value="openai/gpt-4o" {% if config.model == "openai/gpt-4o" %}selected{% endif %}>GPT-4o</option>
                         <option value="anthropic/claude-3.5-sonnet" {% if config.model == "anthropic/claude-3.5-sonnet" %}selected{% endif %}>Claude 3.5 Sonnet</option>
                         <option value="deepseek/deepseek-chat" {% if config.model == "deepseek/deepseek-chat" %}selected{% endif %}>DeepSeek</option>

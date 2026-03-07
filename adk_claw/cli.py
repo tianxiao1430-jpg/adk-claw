@@ -75,7 +75,7 @@ AVAILABLE_MODELS = {
     "Gemini 3.1 (最新)": [
         ("gemini-3.1-pro", "🧠 最强智能，复杂问题，代码生成"),
         ("gemini-3.1-flash", "⚡ 快速高效（推荐）"),
-        ("gemini-3.1-flash-lite", "💨 极低成本，高性能"),
+        ("gemini-3.1-flash-lite-preview", "💨 极低成本，高性能"),
     ],
 "Gemini 3 (预览版)": [
         ("gemini-3-pro", "🔬 最先进多模态理解"),
