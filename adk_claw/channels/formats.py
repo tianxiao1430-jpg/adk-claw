@@ -321,6 +321,10 @@ def extract_internal_content(text: str) -> tuple:
 
     # 提取可见内容
     visible = strip_internal_tags(text)
+    
+    # 防止返回完全为空导致渠道（如 Telegram）发送失败
+    if not visible.strip():
+        visible = "（处理完毕，本次 AI 仅执行了内部思考或未输出可见文本）"
 
     return internal, visible
 
