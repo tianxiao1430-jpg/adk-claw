@@ -150,36 +150,44 @@ def get_model():
 # Agent 定义
 # ============================================
 
+def get_system_instruction() -> str:
+    """构建系统提示词"""
+    from .prompts import build_system_prompt
+
+    base_prompt = build_system_prompt()
+
+    # 添加工具说明
+    tools_prompt = f"""
+
+## 可用工具 (Tools)
+
+你可以使用以下工具：
+
+- **get_current_time**: 获取当前时间
+- **remember**: 记住重要信息
+  - 用法：remember(content, source)
+  - source: "fact" | "preference" | "note"
+- **recall**: 回忆相关信息
+  - 用法：recall(query, limit=5)
+- **forget**: 忘记特定记忆
+  - 用法：forget(content_pattern)
+- **get_memory_stats**: 获取记忆统计
+
+## 记忆策略
+
+- 用户偏好 → 使用 `remember(source="preference")`
+- 重要事实 → 使用 `remember(source="fact")`
+- 临时笔记 → 使用 `remember(source="note")`
+- 需要回忆时 → 使用 `recall()`
+"""
+
+    return base_prompt + tools_prompt
+
+
 adk_claw_agent = LlmAgent(
     name="adk_claw",
     model=get_model(),
-    instruction="""
-你是 ADK Claw，一个智能办公助手。
-
-## 能力
-- 回答问题
-- 执行简单任务
-- 记住和回忆信息
-- 获取当前时间
-
-## 工作原则
-1. 简洁直接
-2. 优先给结果
-3. 不确定时主动询问
-4. 重要信息主动记住
-
-## 工具
-- get_current_time: 获取当前时间
-- remember: 记住重要信息
-- recall: 回忆相关信息
-- forget: 忘记特定记忆
-
-## 记忆策略
-- 用户偏好 → 使用 remember(source="preference")
-- 重要事实 → 使用 remember(source="fact")
-- 临时笔记 → 使用 remember(source="note")
-- 需要回忆时 → 使用 recall()
-""",
+    instruction=get_system_instruction(),
     description="ADK Claw - 智能办公助手",
     tools=TOOLS,
 )
@@ -195,3 +203,6 @@ root_agent = adk_claw_agent
 if __name__ == "__main__":
     print("ADK Claw Agent 已定义")
     print(f"工具数量: {len(TOOLS)}")
+    print("\n系统提示词预览：")
+    print("=" * 60)
+    print(get_system_instruction()[:500] + "...")
