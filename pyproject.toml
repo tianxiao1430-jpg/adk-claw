@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adk-claw"
+version = "0.1.0"
+description = "🦞 ADK Claw - 智能 Agent 平台，基于 Google ADK"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Tianxiao", email = "tianxiao@example.com"}
+]
+keywords = ["ai", "agent", "adk", "gemini", "chatbot"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "google-adk>=0.1.0",
+    "google-genai>=0.3.0",
+    "slack-bolt>=1.18.0",
+    "python-telegram-bot>=20.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.6",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+adk-claw = "cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/tianxiao/adk-claw"
+Documentation = "https://github.com/tianxiao/adk-claw#readme"
+Repository = "https://github.com/tianxiao/adk-claw"
+Issues = "https://github.com/tianxiao/adk-claw/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*.py"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "I"]

@@ -8,48 +8,124 @@
 - ✅ **多模型支持** - Gemini / GPT / Claude / DeepSeek / Ollama
 - ✅ **多渠道** - Slack / Telegram（更多即将推出）
 - ✅ **本地运行** - 零成本，数据不出本地
+- ✅ **交互式安装** - 类似 OpenClaw 的配置向导
 - ✅ **Web 配置界面** - 无需编辑配置文件
 - ✅ **OAuth 支持** - 集成 Google Workspace
 
 ## 快速开始
 
-### 1. 安装
+### 方式一：pip 安装（推荐）
 
 ```bash
+pip install adk-claw
+adk-claw init
+```
+
+### 方式二：从源码安装
+
+```bash
+git clone https://github.com/tianxiao/adk-claw.git
 cd adk-claw
-pip install -r requirements.txt
+pip install -e .
+adk-claw init
 ```
 
-### 2. 启动 Web UI
+### 初始化向导
 
-```bash
-python main.py --web
+运行 `adk-claw init` 后，会进入交互式配置：
+
+```
+🦞 ADK Claw - 智能 Agent 平台
+
+📋 检查环境...
+✅ Python 3.12.0
+
+📦 检查依赖...
+  ✅ google-adk
+  ✅ slack-bolt
+  ✅ python-telegram-bot
+  ✅ fastapi
+
+🔑 API 配置
+至少配置一个 API Key
+
+Google API Key [未配置]: ********************************
+✅ Google API Key 已保存
+
+📱 渠道配置
+至少配置一个渠道
+
+Telegram: ❌ 未配置
+配置 Telegram？ [y/N]: y
+Telegram Bot Token: ********************************
+✅ Telegram 已配置
+
+🤖 模型配置
+ 1  gemini-2.5-flash   Google Gemini 2.5 Flash (推荐)
+ 2  gemini-2.5-pro     Google Gemini 2.5 Pro
+ 3  gpt-4o             OpenAI GPT-4o
+ 4  claude-3-5-sonnet  Anthropic Claude 3.5 Sonnet
+
+选择模型 (当前: gemini-2.5-flash) [1]: 1
+✅ 模型已设置为 gemini-2.5-flash
+
+🎉 安装成功
+
+✅ 初始化完成！
+
+下一步：
+  adk-claw run --web      启动 Web UI
+  adk-claw run --telegram 启动 Telegram Bot
+  adk-claw run --all      启动所有服务
 ```
 
-打开 http://localhost:8080
+## CLI 命令
 
-### 3. 配置
+| 命令 | 说明 | 类似 OpenClaw |
+|------|------|--------------|
+| `adk-claw init` | 初始化配置 | `openclaw setup` |
+| `adk-claw config` | 配置向导 | `openclaw configure` |
+| `adk-claw doctor` | 健康检查 | `openclaw doctor` |
+| `adk-claw run` | 启动服务 | `openclaw gateway` |
+| `adk-claw version` | 显示版本 | `openclaw --version` |
 
-在 Web UI 中配置：
-
-1. **选择模型** - Gemini（免费）/ GPT-4o / Claude
-2. **输入 API Key** - 至少配置一个
-3. **连接渠道** - Slack 或 Telegram
-
-### 4. 启动 Bot
+### 详细用法
 
 ```bash
-# Slack
-python main.py --slack
+# 初始化
+adk-claw init                  # 交互式
+adk-claw init --non-interactive
 
-# Telegram
-python main.py --telegram
+# 配置
+adk-claw config                # 全部配置
+adk-claw config --section api  # 仅 API
+adk-claw config --section channels  # 仅渠道
+adk-claw config --section model     # 仅模型
 
-# 全部
-python main.py --all
+# 健康检查
+adk-claw doctor
+
+# 运行
+adk-claw run --web             # Web UI (localhost:8080)
+adk-claw run --telegram        # Telegram Bot
+adk-claw run --slack           # Slack Bot
+adk-claw run --all             # 所有服务
+adk-claw run --web --port 3000 # 自定义端口
 ```
 
 ## 渠道配置
+
+### Telegram
+
+1. Telegram 搜索 @BotFather
+2. 发送 `/newbot`
+3. 按提示创建
+4. 复制 Token
+
+```bash
+adk-claw config --section channels
+# 选择配置 Telegram，粘贴 Token
+```
 
 ### Slack
 
@@ -62,18 +138,20 @@ python main.py --all
 4. **Socket Mode** → Enable → 生成 App Token
 5. **Event Subscriptions** → `app_mention`
 6. Install to Workspace
-7. 复制 Tokens 到 Web UI
+7. 复制 Tokens
 
-### Telegram
-
-1. Telegram 搜索 @BotFather
-2. 发送 `/newbot`
-3. 按提示创建
-4. 复制 Token 到 Web UI
+```bash
+adk-claw config --section channels
+# 选择配置 Slack，粘贴 Bot Token 和 App Token
+```
 
 ## 换模型
 
-在 Web UI 选择，或编辑 `~/.adk-claw/config.json`：
+```bash
+adk-claw config --section model
+```
+
+或编辑 `~/.adk-claw/config.json`：
 
 ```json
 {
@@ -83,9 +161,10 @@ python main.py --all
 
 支持的模型：
 - `gemini-2.5-flash`（推荐，免费）
-- `openai/gpt-4o`
-- `anthropic/claude-3.5-sonnet`
-- `deepseek/deepseek-chat`
+- `gemini-2.5-pro`
+- `gpt-4o`
+- `claude-3-5-sonnet`
+- `deepseek-chat`
 - `ollama/llama3.1`（本地）
 
 ## 添加工具
@@ -103,6 +182,10 @@ TOOLS.append(FunctionTool(func=my_tool))
 ## 架构
 
 ```
+┌─────────────────────────────────────────────┐
+│  CLI (adk-claw init/config/run)             │
+└────────────────┬────────────────────────────┘
+                 ↓
 ┌─────────────────────────────────────────────┐
 │  Web UI (localhost:8080)                    │
 │  - 配置 API Keys                            │
@@ -126,6 +209,7 @@ TOOLS.append(FunctionTool(func=my_tool))
 | 多模型 | ✅ 100+ | ❌ 仅 Claude | ✅ |
 | Google 生态 | ✅ 深度集成 | ⚠️ 需配置 | ⚠️ 假 ADK |
 | 本地部署 | ✅ 完全本地 | ✅ | ✅ |
+| 安装体验 | ✅ 交互式 | ✅ 交互式 | ⚠️ 手动 |
 | 开源 | ✅ MIT | ✅ | ✅ |
 
 ## 路线图
@@ -134,6 +218,7 @@ TOOLS.append(FunctionTool(func=my_tool))
 - [x] Web 配置界面
 - [x] 多模型支持
 - [x] 记忆系统（SQLite + FTS）
+- [x] CLI 安装向导
 - [ ] 向量搜索（嵌入向量）
 - [ ] 图片理解
 - [ ] 更多工具（Gmail/Calendar/Drive）
@@ -153,33 +238,21 @@ Bot：📚 相关记忆：
 - 你喜欢简洁的回复
 ```
 
-### 记忆工具
-
-| 工具 | 用途 |
-|------|------|
-| `remember` | 记住信息 |
-| `recall` | 回忆信息 |
-| `forget` | 忘记信息 |
-| `get_memory_stats` | 查看统计 |
-
 ### 存储位置
 
 ```
-~/.adk-claw/memory.db
-```
-
-### 手动管理
-
-可以编辑 `MEMORY.md` 或 `memory/*.md`，然后运行：
-
-```python
-from memory import memory_manager
-memory_manager.load_memory_files("/path/to/workspace")
+~/.adk-claw/
+├── config.json      # 配置
+├── secrets.json     # 密钥
+└── memory.db        # 记忆数据库
 ```
 
 ## 开发
 
 ```bash
+# 安装开发依赖
+pip install -e ".[dev]"
+
 # 运行测试
 pytest
 

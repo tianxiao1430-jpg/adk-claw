@@ -10,11 +10,16 @@ slack-bolt>=1.18.0
 # Telegram
 python-telegram-bot>=20.0
 
-# Web UI
+# Web UI & Gateway
 fastapi>=0.104.0
 uvicorn>=0.24.0
+websockets>=12.0
 jinja2>=3.1.0
 python-multipart>=0.0.6
+
+# CLI
+click>=8.1.0
+rich>=13.0.0
 
 # 记忆系统
 requests>=2.31.0
