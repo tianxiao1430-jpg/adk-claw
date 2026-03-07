@@ -115,44 +115,6 @@ def get_memory_stats() -> str:
     return "\n".join(lines)
 
 
-def get_weather(location: str) -> str:
-    """获取指定城市的实时天气和未来三天预报
-    
-    Args:
-        location: 城市拼音或英文名称，如 "Tokyo", "Beijing"
-        
-    Returns:
-        天气预报的文本描述
-    """
-    try:
-        import urllib.request
-        from urllib.parse import quote
-        import json
-        
-        url = f"https://wttr.in/{quote(location)}?format=j1"
-        req = urllib.request.Request(url, headers={'User-Agent': 'curl/7.68.0'})
-        with urllib.request.urlopen(req) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            
-            result = [f"【{location} 天气预报】"]
-            
-            # 当前天气
-            current = data['current_condition'][0]
-            result.append(f"当前：{current['weatherDesc'][0]['value']}，气温 {current['temp_C']}°C，体感 {current['FeelsLikeC']}°C，湿度 {current['humidity']}%")
-            
-            # 未来几天
-            for day in data['weather'][:3]:
-                date = day['date']
-                maxtemp = day['maxtempC']
-                mintemp = day['mintempC']
-                uv = day['uvIndex']
-                result.append(f"{date}: 最高 {maxtemp}°C，最低 {mintemp}°C，UV指数 {uv}")
-                
-            return "\n".join(result)
-    except Exception as e:
-        return f"获取 {location} 的天气失败: {str(e)}"
-
-
 # ============================================
 # 网络搜索工具
 # ============================================
@@ -184,7 +146,6 @@ def web_search(query: str, limit: int = 5) -> str:
 # 注册工具
 TOOLS = [
     FunctionTool(func=web_search),
-    FunctionTool(func=get_weather),
     FunctionTool(func=get_current_time),
     FunctionTool(func=echo_message),
     FunctionTool(func=remember),
@@ -240,8 +201,6 @@ def get_system_instruction(channel: str = "telegram") -> str:
 你可以使用以下工具：
 
 - **get_current_time**: 获取当前时间
-- **get_weather**: 获取指定城市的天气预报
-  - 用法：get_weather(location)
 - **web_search**: 通过 DuckDuckGo 搜索网络获取实时信息（天气、新闻、百科等）
   - 用法：web_search(query, limit=5)
   - 核心指令：当你遇到自己不知道、未训练过、或需要最新数据的提问时（如明天天气、最新新闻），**必须**立即使用此工具。
