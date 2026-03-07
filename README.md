@@ -221,7 +221,7 @@ TOOLS.append(FunctionTool(func=my_tool))
 - [x] 记忆系统（SQLite + FTS）
 - [x] CLI 安装向导
 - [ ] 向量搜索（嵌入向量）
-- [ ] 图片理解
+- [x] 图片理解（支持 Telegram - [ ] 图片理解 Slack）
 - [ ] 更多工具（Gmail/Calendar/Drive）
 - [ ] Cloud Run 部署
 - [ ] 更多渠道（Discord/WhatsApp）

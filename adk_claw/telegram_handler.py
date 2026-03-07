@@ -54,13 +54,13 @@ async def get_or_create_session(user_id: str) -> str:
     return user_sessions[user_id]
 
 
-async def run_agent(user_id: int, message: str) -> str:
+async def run_agent(user_id: int, parts: list) -> str:
     """运行 Agent"""
     session_id = await get_or_create_session(str(user_id))
 
     content = types.Content(
         role="user",
-        parts=[types.Part(text=message)]
+        parts=parts
     )
 
     events = runner.run_async(
@@ -107,11 +107,25 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """处理普通消息"""
+    """处理消息和图片"""
     user_id = update.effective_user.id
-    message = update.message.text
 
-    print(f"[Telegram] {user_id}: {message}")
+    parts = []
+    text = update.message.text or update.message.caption or ""
+    
+    if text:
+        parts.append(types.Part.from_text(text=text))
+        
+    if update.message.photo:
+        photo = update.message.photo[-1]
+        photo_file = await photo.get_file()
+        photo_bytes = await photo_file.download_as_bytearray()
+        parts.append(types.Part.from_bytes(data=bytes(photo_bytes), mime_type="image/jpeg"))
+
+    if not parts:
+        return
+
+    print(f"[Telegram] {user_id}: 收到消息 (含图片: {bool(update.message.photo)})")
 
     # 显示正在输入
     await context.bot.send_chat_action(
@@ -120,7 +134,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     # 运行 Agent
-    response = await run_agent(user_id, message)
+    response = await run_agent(user_id, parts)
 
     # 提取 internal 内容和可见内容
     internal_content, visible_content = extract_internal_content(response)
@@ -154,7 +168,7 @@ def start_telegram(token: str):
     # 注册处理器
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler((filters.TEXT | filters.PHOTO) & ~filters.COMMAND, handle_message))
 
     print("✅ Telegram Bot 已启动")
 

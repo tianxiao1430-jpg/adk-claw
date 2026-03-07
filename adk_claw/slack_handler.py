@@ -7,8 +7,9 @@ Slack 事件处理
 import os
 import re
 import asyncio
-from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+import httpx
+from slack_bolt.async_app import AsyncApp
+from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 
 from .agent import create_agent
 from .formats import extract_internal_content
@@ -62,13 +63,13 @@ async def get_or_create_session(user_id: str) -> str:
     return user_sessions[user_id]
 
 
-async def run_agent(user_id: str, message: str) -> str:
+async def run_agent(user_id: str, parts: list) -> str:
     """运行 Agent"""
     session_id = await get_or_create_session(user_id)
 
     content = types.Content(
         role="user",
-        parts=[types.Part(text=message)]
+        parts=parts
     )
 
     events = runner.run_async(
@@ -106,20 +107,42 @@ def init_app():
         print("❌ 错误：请配置 Slack Bot Token 和 App Token")
         return False
 
-    app = App(token=bot_token)
-    handler = SocketModeHandler(app, app_token)
+    app = AsyncApp(token=bot_token)
+    handler = AsyncSocketModeHandler(app, app_token)
 
     # 注册事件处理器
     @app.event("app_mention")
     async def handle_mention(event, say):
-        """处理 @提及"""
+        """处理 @提及和图片"""
         user = event.get("user", "unknown")
         text = re.sub(r"<@[^>]+>", "", event.get("text", "")).strip()
 
-        print(f"[Slack] @{user}: {text}")
+        parts = []
+        if text:
+            parts.append(types.Part.from_text(text=text))
+
+        # 下载图片
+        files = event.get("files", [])
+        for file in files:
+            url = file.get("url_private_download")
+            mimetype = file.get("mimetype", "image/jpeg")
+            if url and mimetype.startswith("image/"):
+                try:
+                    import httpx
+                    async with httpx.AsyncClient() as client:
+                        resp = await client.get(url, headers={"Authorization": f"Bearer {bot_token}"})
+                        if resp.status_code == 200:
+                            parts.append(types.Part.from_bytes(data=resp.content, mime_type=mimetype))
+                except Exception as e:
+                    print(f"下载 Slack 图片失败: {e}")
+
+        if not parts:
+            return
+
+        print(f"[Slack] @{user}: 收到消息 (含图片: {len(files) > 0})")
 
         # 运行 Agent
-        response = await run_agent(user, text)
+        response = await run_agent(user, parts)
 
         # 提取 internal 内容
         internal_content, visible_content = extract_internal_content(response)
@@ -140,10 +163,32 @@ def init_app():
         user = event.get("user", "unknown")
         text = event.get("text", "")
 
-        print(f"[Slack] DM @{user}: {text}")
+        parts = []
+        if text:
+            parts.append(types.Part.from_text(text=text))
+
+        # 下载图片
+        files = event.get("files", [])
+        for file in files:
+            url = file.get("url_private_download")
+            mimetype = file.get("mimetype", "image/jpeg")
+            if url and mimetype.startswith("image/"):
+                try:
+                    import httpx
+                    async with httpx.AsyncClient() as client:
+                        resp = await client.get(url, headers={"Authorization": f"Bearer {bot_token}"})
+                        if resp.status_code == 200:
+                            parts.append(types.Part.from_bytes(data=resp.content, mime_type=mimetype))
+                except Exception as e:
+                    print(f"下载 Slack 图片失败: {e}")
+
+        if not parts:
+            return
+
+        print(f"[Slack] DM @{user}: 收到消息 (含图片: {len(files) > 0})")
 
         # 运行 Agent
-        response = await run_agent(user, text)
+        response = await run_agent(user, parts)
 
         # 提取 internal 内容
         internal_content, visible_content = extract_internal_content(response)
@@ -157,14 +202,19 @@ def init_app():
     return True
 
 
-def start():
-    """启动 Slack Bot"""
+async def start_async():
     if not init_app():
         return
-
     print("💬 Slack Bot 启动中...")
-    handler.start()
-    print("✅ Slack Bot 已启动")
+    await handler.start_async()
+
+def start():
+    """启动 Slack Bot"""
+    try:
+        asyncio.run(start_async())
+    except KeyboardInterrupt:
+        pass
+    print("✅ Slack Bot 已停止")
 
 
 if __name__ == "__main__":
