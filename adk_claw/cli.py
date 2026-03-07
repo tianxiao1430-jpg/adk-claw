@@ -5,13 +5,15 @@ ADK Claw - CLI 入口
 类似 OpenClaw 的安装体验：
 - adk-claw init    # 初始化配置
 - adk-claw config  # 配置向导
-- adk-claw run     # 启动服务
+- adk-claw run     # 启动服务（旧方式）
+- adk-claw gateway # 启动网关（新方式）
 - adk-claw doctor  # 健康检查
 """
 
 import os
 import sys
 import subprocess
+import asyncio
 from pathlib import Path
 from typing import Optional
 
@@ -63,6 +65,56 @@ def check_dependencies():
             missing.append(name)
 
     return missing
+
+
+# ============================================
+# 可用模型列表
+# ============================================
+
+AVAILABLE_MODELS = {
+    "Gemini (Google)": [
+        ("gemini-2.5-flash-preview", "⚡ 最新！快速高效（推荐）"),
+        ("gemini-2.5-pro-preview", "🧠 最新！最强推理能力"),
+        ("gemini-2.0-flash", "🚀 稳定版，快速响应"),
+        ("gemini-2.0-flash-lite-preview", "💨 轻量版，极速响应"),
+        ("gemini-2.0-pro-exp", "🔬 实验版，前沿功能"),
+        ("gemini-1.5-flash", "📦 经典版，稳定可靠"),
+        ("gemini-1.5-flash-8b", "📦 经济版，成本优化"),
+        ("gemini-1.5-pro", "📦 经典版，强大能力"),
+    ],
+    "GPT (OpenAI)": [
+        ("openai/gpt-4.1", "🆕 最新 GPT-4.1"),
+        ("openai/gpt-4.1-mini", "🆕 GPT-4.1 Mini"),
+        ("openai/gpt-4.1-nano", "🆕 GPT-4.1 Nano"),
+        ("openai/gpt-4o", "🎯 GPT-4 Omni"),
+        ("openai/gpt-4o-mini", "⚡ GPT-4 Omni Mini"),
+        ("openai/o3-mini", "🧠 O3 Mini 推理模型"),
+    ],
+    "Claude (Anthropic)": [
+        ("anthropic/claude-3.7-sonnet", "🆕 最新 Claude 3.7 Sonnet"),
+        ("anthropic/claude-3.5-sonnet", "🎯 Claude 3.5 Sonnet"),
+        ("anthropic/claude-3.5-haiku", "⚡ Claude 3.5 Haiku"),
+    ],
+    "DeepSeek": [
+        ("deepseek/deepseek-chat", "💬 DeepSeek Chat"),
+        ("deepseek/deepseek-reasoner", "🧠 DeepSeek Reasoner"),
+    ],
+    "本地模型 (Ollama)": [
+        ("ollama/llama3.3", "🦙 Llama 3.3"),
+        ("ollama/llama3.2", "🦙 Llama 3.2"),
+        ("ollama/qwen2.5", "🌟 Qwen 2.5"),
+        ("ollama/deepseek-r1", "🧠 DeepSeek R1"),
+        ("ollama/gemma3", "💎 Gemma 3"),
+    ],
+}
+
+
+def get_all_models_flat():
+    """获取扁平化的模型列表"""
+    models = []
+    for provider, model_list in AVAILABLE_MODELS.items():
+        models.extend(model_list)
+    return models
 
 
 # ============================================
@@ -192,32 +244,43 @@ def run_config_wizard(section: str = "all"):
 
     # Model
     if section in ["model", "all"]:
-        console.print("[bold]🤖 模型配置[/bold]")
+        run_model_selection(app_config)
 
-        models = [
-            ("gemini-2.5-flash", "Google Gemini 2.5 Flash (推荐)"),
-            ("gemini-2.5-pro", "Google Gemini 2.5 Pro"),
-            ("gpt-4o", "OpenAI GPT-4o"),
-            ("claude-3-5-sonnet", "Anthropic Claude 3.5 Sonnet"),
-        ]
 
-        table = Table(show_header=False)
-        for i, (model, desc) in enumerate(models, 1):
-            table.add_row(f"[cyan]{i}[/cyan]", model, f"[dim]{desc}[/dim]")
-        console.print(table)
+def run_model_selection(app_config):
+    """运行模型选择向导"""
+    console.print("[bold]🤖 模型配置[/bold]")
+    console.print("[dim]选择 AI 模型（按数字选择）[/dim]")
+    console.print()
 
-        current = app_config.get_model()
-        choice = Prompt.ask(f"选择模型 (当前: {current})", default="1")
+    current = app_config.get_model()
 
-        try:
-            idx = int(choice) - 1
-            if 0 <= idx < len(models):
-                app_config.set_model(models[idx][0])
-                console.print(f"[green]✅ 模型已设置为 {models[idx][0]}[/green]")
-        except ValueError:
-            pass
+    # 显示所有模型
+    idx = 1
+    model_map = {}
 
+    for provider, models in AVAILABLE_MODELS.items():
+        console.print(f"[bold yellow]{provider}[/bold yellow]")
+        for model_id, desc in models:
+            marker = " ✓" if model_id == current else ""
+            console.print(f"  [cyan]{idx:2d}[/cyan]. {model_id:35s} [dim]{desc}[/dim]{marker}")
+            model_map[idx] = model_id
+            idx += 1
         console.print()
+
+    # 选择
+    choice = Prompt.ask(f"选择模型 (当前: {current})", default="1")
+
+    try:
+        selected_idx = int(choice)
+        if selected_idx in model_map:
+            selected_model = model_map[selected_idx]
+            app_config.set_model(selected_model)
+            console.print(f"[green]✅ 模型已设置为 {selected_model}[/green]")
+    except ValueError:
+        console.print("[yellow]无效选择，保持当前模型[/yellow]")
+
+    console.print()
 
 
 @cli.command()
@@ -318,6 +381,24 @@ def version():
     """显示版本"""
     from . import __version__
     console.print(f"[bold cyan]ADK Claw[/bold cyan] v{__version__}")
+
+
+@cli.command("list-models")
+def list_models():
+    """列出所有可用模型"""
+    console.print(Panel.fit(
+        "[bold cyan]🤖 可用模型列表[/bold cyan]",
+        border_style="cyan"
+    ))
+    console.print()
+
+    for provider, models in AVAILABLE_MODELS.items():
+        console.print(f"[bold yellow]{provider}[/bold yellow]")
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        for model_id, desc in models:
+            table.add_row(f"[cyan]{model_id}[/cyan]", f"[dim]{desc}[/dim]")
+        console.print(table)
+        console.print()
 
 
 # ============================================
