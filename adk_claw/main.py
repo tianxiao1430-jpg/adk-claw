@@ -6,8 +6,9 @@ ADK Claw - 主入口
 import os
 import sys
 import time
-
 import logging
+import asyncio
+import threading
 from pathlib import Path
 
 from .config import config
@@ -101,8 +102,6 @@ def main():
     # Web UI
     if args.web or args.all:
         from .web_ui import start_web_ui
-        import threading
-        import time
         
         web_thread = threading.Thread(
             target=start_web_ui,
@@ -126,7 +125,6 @@ def main():
             )
             
             # 启动（阻塞模式）
-            import asyncio
             asyncio.run(channel.start())
             print("💬 Slack Bot 已启动")
             
@@ -150,7 +148,6 @@ def main():
             channel = create_telegram_channel(agent=agent, token=token)
             
             # 启动（阻塞模式）
-            import asyncio
             asyncio.run(channel.start())
             print("📱 Telegram Bot 已启动")
             
