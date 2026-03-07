@@ -5,8 +5,12 @@ ADK Claw - Agent 定义
 """
 
 import os
+import logging
 from google.adk.agents import LlmAgent
 from google.adk.tools import FunctionTool
+
+# 配置日志
+logger = logging.getLogger("adk_claw")
 
 try:
     from .config import config
@@ -130,7 +134,7 @@ def web_search(query: str, limit: int = 5) -> str:
         包含标题、摘要和链接的搜索结果文本
     """
     try:
-        from ddgs import DDGS
+        from duckduckgo_search import DDGS
         results = []
         with DDGS() as ddgs:
             for r in ddgs.text(query, max_results=limit):
@@ -140,6 +144,8 @@ def web_search(query: str, limit: int = 5) -> str:
             return f"没有找到关于 '{query}' 的搜索结果。"
             
         return "\n\n".join(results)
+    except ImportError:
+        return "❌ 搜索功能不可用：未安装 duckduckgo-search 库\n安装: pip install duckduckgo-search"
     except Exception as e:
         return f"搜索失败: {str(e)}"
 
@@ -149,11 +155,19 @@ def web_search(query: str, limit: int = 5) -> str:
 # ============================================
 
 def _load_google_workspace_toolsets():
-    """加载 ADK 内置的 Google Workspace 工具集"""
+    """加载 ADK 内置的 Google Workspace 工具集
+    
+    Returns:
+        工具集列表（失败时返回空列表）
+    """
     try:
         from .tools.adk_google_workspace import create_all_google_workspace_toolsets
         return create_all_google_workspace_toolsets()
-    except ImportError:
+    except ImportError as e:
+        logger.warning(f"Google Workspace 工具集不可用: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"加载 Google Workspace 工具集失败: {e}")
         return []
 
 
@@ -174,7 +188,9 @@ TOOLS = [
 
 # 添加 ADK 内置 Google Workspace 工具集
 google_workspace_toolsets = _load_google_workspace_toolsets()
-TOOLS.extend(google_workspace_toolsets)
+if google_workspace_toolsets:
+    TOOLS.extend(google_workspace_toolsets)
+    logger.info(f"已加载 {len(google_workspace_toolsets)} 个 Google Workspace 工具集")
 
 
 # ============================================

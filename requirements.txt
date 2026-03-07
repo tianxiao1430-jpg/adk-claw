@@ -27,5 +27,5 @@ requests>=2.31.0
 # 其他
 python-dotenv>=1.0.0
 
-# 搜索
-ddgs>=9.0.0
+# 搜索（修复：正确的包名）
+duckduckgo-search>=6.0.0
