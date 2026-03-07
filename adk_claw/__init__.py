@@ -10,7 +10,7 @@ __version__ = "0.1.0"
 from .agent import adk_claw_agent, root_agent, create_agent, get_system_instruction
 from .config import config
 from .prompts import build_system_prompt
-from .formats import (
+from .channels.formats import (
     get_format_prompt,
     inject_format_prompt,
     extract_internal_content,

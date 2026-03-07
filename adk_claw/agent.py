@@ -227,7 +227,7 @@ def get_system_instruction(channel: str = "telegram") -> str:
         完整的系统提示词
     """
     from .prompts import build_system_prompt
-    from .formats import get_format_prompt, inject_format_prompt
+    from .channels.formats import get_format_prompt, inject_format_prompt
 
     base_prompt = build_system_prompt()
 
