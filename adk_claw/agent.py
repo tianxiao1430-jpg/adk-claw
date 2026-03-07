@@ -12,7 +12,7 @@ try:
     from .config import config
     MODEL = config.get_model()
 except ImportError:
-    MODEL = os.environ.get("ADK_MODEL", "gemini-2.5-flash")
+    MODEL = os.environ.get("ADK_MODEL", "gemini-3.1-flash")
 
 
 # ============================================

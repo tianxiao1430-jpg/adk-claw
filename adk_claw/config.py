@@ -33,7 +33,7 @@ class Config:
             with open(CONFIG_FILE, "r") as f:
                 return json.load(f)
         return {
-            "model": "gemini-2.5-flash",
+            "model": "gemini-3.1-flash",
             "channels": {
                 "slack": {"enabled": False},
                 "telegram": {"enabled": False}
@@ -138,7 +138,7 @@ class Config:
     
     def get_model(self) -> str:
         """获取模型"""
-        return self.config.get("model", "gemini-2.5-flash")
+        return self.config.get("model", "gemini-3.1-flash")
     
     # ============================================
     # OAuth

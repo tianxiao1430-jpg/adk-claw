@@ -61,13 +61,13 @@ Telegram Bot Token: ********************************
 ✅ Telegram 已配置
 
 🤖 模型配置
- 1  gemini-2.5-flash   Google Gemini 2.5 Flash (推荐)
- 2  gemini-2.5-pro     Google Gemini 2.5 Pro
+ 1  gemini-3.1-flash   Google Gemini 3.1 Flash (推荐)
+ 2  gemini-3.1-pro     Google Gemini 3.1 Pro
  3  gpt-4o             OpenAI GPT-4o
  4  claude-3-5-sonnet  Anthropic Claude 3.5 Sonnet
 
-选择模型 (当前: gemini-2.5-flash) [1]: 1
-✅ 模型已设置为 gemini-2.5-flash
+选择模型 (当前: gemini-3.1-flash) [1]: 1
+✅ 模型已设置为 gemini-3.1-flash
 
 🎉 安装成功
 
@@ -155,13 +155,14 @@ adk-claw config --section model
 
 ```json
 {
-  "model": "gemini-2.5-flash"
+  "model": "gemini-3.1-flash"
 }
 ```
 
 支持的模型：
-- `gemini-2.5-flash`（推荐，免费）
-- `gemini-2.5-pro`
+- `gemini-3.1-flash`（推荐，免费）
+- `gemini-3.1-flash-lite`（极低成本）
+- `gemini-3.1-pro`
 - `gpt-4o`
 - `claude-3-5-sonnet`
 - `deepseek-chat`

@@ -190,7 +190,7 @@ GET  /memory/search       # 搜索记忆
   },
   "agents": {
     "default": {
-      "model": "gemini-2.5-flash",
+      "model": "gemini-3.1-flash",
       "system_prompt": "你是一个有用的助手",
       "tools": ["remember", "recall", "web_search"]
     },
