@@ -5,11 +5,17 @@ ADK Claw - 主入口
 
 import os
 import sys
-import threading
-import time
+import logging
 from pathlib import Path
 
 from .config import config
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(message)s'
+)
+logger = logging.getLogger("adk_claw")
 
 
 def check_requirements():
@@ -29,7 +35,7 @@ def check_requirements():
     has_anthropic = bool(config.get_anthropic_api_key())
 
     if not has_google and not has_openai and not has_anthropic:
-        missing.append("至少配置一个 API Key（Google/OpenAI/Anthropic）")
+        missing.append("至少配置一个 API Key（Google/OpenAI/Anthropic)")
 
     return missing
 
@@ -57,9 +63,8 @@ def print_status():
 def main():
     """主函数"""
     import argparse
-    import os
 
-    # 注入 API Key 到环境变量，供底层的 google-genai 或其他 SDK 使用
+    # 注入 API Key 到环境变量
     google_key = config.get_google_api_key()
     if google_key:
         os.environ["GEMINI_API_KEY"] = google_key
@@ -75,7 +80,7 @@ def main():
     print_banner()
     print_status()
 
-    # 如果没有指定任何参数，启动 Web UI
+    # 如果没有指定任何参数， 启动 Web UI
     if not args.web and not args.slack and not args.telegram and not args.all:
         print("💡 使用 --help 查看帮助")
         print("🌐 启动 Web UI 进行配置...")
@@ -85,7 +90,7 @@ def main():
     if args.slack or args.telegram or args.all:
         missing = check_requirements()
         if missing:
-            print("❌ 配置不完整：")
+            print("❌ 配置不完整: ")
             for m in missing:
                 print(f"   - {m}")
             print("\n💡 请先通过 Web UI 配置: adk-claw run --web")
@@ -94,6 +99,9 @@ def main():
     # Web UI
     if args.web or args.all:
         from .web_ui import start_web_ui
+        import threading
+        import time
+        
         web_thread = threading.Thread(
             target=start_web_ui,
             kwargs={"port": args.port},
@@ -102,27 +110,54 @@ def main():
         web_thread.start()
         print(f"🌐 Web UI: http://localhost:{args.port}")
 
-    # Slack
+    # Slack（使用新的 channels 模块）
     if args.slack or args.all:
         if config.get_slack_bot_token():
-            from .slack_handler import start as start_slack
-            slack_thread = threading.Thread(target=start_slack, daemon=True)
-            slack_thread.start()
+            from .channels.slack import create_slack_channel
+            from .agent import create_agent
+            
+            agent = create_agent("slack")
+            channel = create_slack_channel(
+                agent=agent,
+                bot_token=config.get_slack_bot_token(),
+                app_token=config.get_slack_app_token()
+            )
+            
+            # 启动（阻塞模式）
+            import asyncio
+            asyncio.run(channel.start())
             print("💬 Slack Bot 已启动")
+            
+            # 保持运行
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\n👋 再见!")
         else:
             print("⚠️  Slack 未配置，跳过")
 
-    # Telegram（阻塞模式）
+    # Telegram（使用新的 channels 模块）
     if args.telegram or args.all:
         token = config.get_telegram_token()
         if token:
-            from telegram import Update
-            from .telegram_handler import start_telegram
-            app = start_telegram(token)
-            if app:
-                print("📱 Telegram Bot 已启动")
-                # Telegram 在主线程运行（阻塞）
-                app.run_polling(allowed_updates=Update.ALL_TYPES)
+            from .channels.telegram import create_telegram_channel
+            from .agent import create_agent
+            
+            agent = create_agent("telegram")
+            channel = create_telegram_channel(agent=agent, token=token)
+            
+            # 启动（阻塞模式）
+            import asyncio
+            asyncio.run(channel.start())
+            print("📱 Telegram Bot 已启动")
+            
+            # 保持运行
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\n👋 再见!")
         else:
             print("⚠️  Telegram 未配置，跳过")
 
@@ -134,7 +169,7 @@ def main():
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print("\n👋 再见！")
+            print("\n👋 再见!")
 
 
 if __name__ == "__main__":
