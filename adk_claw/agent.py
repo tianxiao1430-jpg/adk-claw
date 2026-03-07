@@ -115,8 +115,37 @@ def get_memory_stats() -> str:
     return "\n".join(lines)
 
 
+# ============================================
+# 网络搜索工具
+# ============================================
+
+def web_search(query: str, limit: int = 5) -> str:
+    """通过 DuckDuckGo 搜索网络获取实时信息
+    
+    Args:
+        query: 搜索关键词
+        limit: 返回的结果数量上限
+        
+    Returns:
+        包含标题、摘要和链接的搜索结果文本
+    """
+    try:
+        from duckduckgo_search import DDGS
+        results = []
+        with DDGS() as ddgs:
+            for r in ddgs.text(query, max_results=limit):
+                results.append(f"标题: {r.get('title')}\n内容: {r.get('body')}\n链接: {r.get('href')}")
+        
+        if not results:
+            return f"没有找到关于 '{query}' 的搜索结果。"
+            
+        return "\n\n".join(results)
+    except Exception as e:
+        return f"搜索失败: {str(e)}"
+
 # 注册工具
 TOOLS = [
+    FunctionTool(func=web_search),
     FunctionTool(func=get_current_time),
     FunctionTool(func=echo_message),
     FunctionTool(func=remember),
@@ -124,6 +153,7 @@ TOOLS = [
     FunctionTool(func=forget),
     FunctionTool(func=get_memory_stats),
 ]
+
 
 
 # ============================================

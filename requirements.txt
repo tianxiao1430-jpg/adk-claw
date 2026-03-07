@@ -26,3 +26,6 @@ requests>=2.31.0
 
 # 其他
 python-dotenv>=1.0.0
+
+# 搜索
+duckduckgo-search>=6.0.0

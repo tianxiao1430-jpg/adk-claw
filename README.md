@@ -220,7 +220,7 @@ TOOLS.append(FunctionTool(func=my_tool))
 - [x] 多模型支持
 - [x] 记忆系统（SQLite + FTS）
 - [x] CLI 安装向导
-- [ ] 向量搜索（嵌入向量）
+- [x] 网络搜索工具 (DuckDuckGo)\n- [ ] 向量搜索（嵌入向量）
 - [x] 图片理解（支持 Telegram - [ ] 图片理解 Slack）
 - [ ] 更多工具（Gmail/Calendar/Drive）
 - [ ] Cloud Run 部署
