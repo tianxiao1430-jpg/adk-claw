@@ -202,6 +202,123 @@ TOOLS.append(FunctionTool(func=my_tool))
     Slack (Socket)      Telegram (Polling)
 ```
 
+## 部署方案
+
+ADK Claw 提供两种部署方案，满足不同场景需求：
+
+### 方案 A：本地部署（推荐个人/小团队）
+
+**特点：完全免费、数据本地、适合开发测试**
+
+| 组件 | 技术方案 | 持久化 | 费用 |
+|------|---------|--------|------|
+| **Memory** | SQLite + FTS | ✅ 本地持久化 | $0 |
+| **Artifacts** | FileArtifactService (ADK 原生) | ✅ 本地文件 | $0 |
+| **Sessions** | InMemorySessionService (ADK 原生) | ❌ 重启丢失 | $0 |
+
+**架构：**
+```
+┌─────────────────────────────────────────┐
+│  本地机器 (Mac/Linux/Windows)           │
+│  ├── ADK Claw Bot                       │
+│  ├── SQLite (~/.adk-claw/memory.db)     │
+│  └── FileArtifactService                │
+└─────────────────────────────────────────┘
+```
+
+**优点：**
+- ✅ 完全免费
+- ✅ 数据不出本地（隐私）
+- ✅ 持久化记忆（SQLite）
+- ✅ 快速开发调试
+
+**缺点：**
+- ❌ 需要本地机器一直开机
+- ❌ 记忆搜索仅关键词匹配（无语义理解）
+
+**启动命令：**
+```bash
+python3.10 -m adk_claw.cli run --telegram
+```
+
+---
+
+### 方案 B：云端部署（推荐企业/团队）
+
+**特点：完全 ADK 原生、企业级、语义搜索**
+
+| 组件 | 技术方案 | 持久化 | 费用 |
+|------|---------|--------|------|
+| **Memory** | VertexAiMemoryBankService (ADK 原生) | ✅ 云端 | ~$1-20/月 |
+| **Artifacts** | GcsArtifactService (ADK 原生) | ✅ GCS | ~$0.1/月 |
+| **Sessions** | VertexAiSessionService (ADK 原生) | ✅ 云端 | 包含在 Memory 中 |
+
+**架构：**
+```
+┌─────────────────────────────────────────┐
+│  Cloud Run 容器                          │
+│  ├── ADK Claw Bot                       │
+│  └── ADK 原生服务                        │
+└─────────────────────────────────────────┘
+         ↓
+┌─────────────────────────────────────────┐
+│  GCP 服务                                │
+│  ├── Vertex AI Memory Bank              │
+│  ├── Cloud Storage (GCS)                │
+│  └── Vertex AI Session                  │
+└─────────────────────────────────────────┘
+```
+
+**优点：**
+- ✅ 完全 ADK 原生（无需自己实现存储）
+- ✅ 语义搜索（理解用户意图）
+- ✅ 24/7 在线（Cloud Run）
+- ✅ 企业级 SLA
+
+**缺点：**
+- ❌ 需要付费（~$1-20/月，视使用量）
+- ❌ 需要 GCP 账号配置
+
+**费用估算（10人团队）：**
+| 项目 | 月费用 |
+|------|--------|
+| Cloud Run (1 vCPU, 512MB) | ~$5-10 |
+| Vertex AI Memory Bank | ~$1-5 |
+| Cloud Storage (1GB) | ~$0.02 |
+| **总计** | **~$6-15/月** |
+
+**部署命令：**
+```bash
+# 1. 配置 GCP
+gcloud config set project your-project-id
+
+# 2. 部署到 Cloud Run
+gcloud run deploy adk-claw \
+  --source . \
+  --region asia-northeast1 \
+  --allow-unauthenticated \
+  --set-env-vars "GOOGLE_API_KEY=xxx,TELEGRAM_BOT_TOKEN=xxx"
+```
+
+---
+
+### 方案对比总结
+
+| 维度 | 方案 A（本地） | 方案 B（云端） |
+|------|---------------|---------------|
+| **费用** | **$0** | ~$6-15/月 |
+| **记忆搜索** | 关键词匹配 | **语义理解** |
+| **可用性** | 需本地开机 | **24/7 在线** |
+| **隐私** | **数据本地** | 数据在 GCP |
+| **适合场景** | 个人/开发/测试 | 企业/团队/生产 |
+| **ADK 原生** | 部分（Artifacts/Sessions） | **完全原生** |
+
+**推荐：**
+- 🏠 **个人使用** → 方案 A（本地部署）
+- 🏢 **企业团队** → 方案 B（云端部署）
+
+---
+
 ## 与其他方案对比
 
 | 维度 | ADK Claw | OpenClaw | PocketPaw |
@@ -220,8 +337,10 @@ TOOLS.append(FunctionTool(func=my_tool))
 - [x] 多模型支持
 - [x] 记忆系统（SQLite + FTS）
 - [x] CLI 安装向导
-- [x] 网络搜索工具 (DuckDuckGo)\n- [ ] 向量搜索（嵌入向量）
-- [x] 图片理解（支持 Telegram - [ ] 图片理解 Slack）
+- [x] 网络搜索工具 (DuckDuckGo)
+- [ ] 向量搜索（嵌入向量）
+- [x] 图片理解（支持 Telegram）
+- [ ] 图片理解（Slack）
 - [ ] 更多工具（Gmail/Calendar/Drive）
 - [ ] Cloud Run 部署
 - [ ] 更多渠道（Discord/WhatsApp）
@@ -241,11 +360,19 @@ Bot：📚 相关记忆：
 
 ### 存储位置
 
+**方案 A（本地）：**
 ```
 ~/.adk-claw/
 ├── config.json      # 配置
 ├── secrets.json     # 密钥
-└── memory.db        # 记忆数据库
+├── memory.db        # SQLite 记忆数据库
+└── artifacts/       # 文件存储
+```
+
+**方案 B（云端）：**
+```
+GCP Vertex AI Memory Bank  # 语义记忆
+GCP Cloud Storage          # 文件存储
 ```
 
 ## 开发
