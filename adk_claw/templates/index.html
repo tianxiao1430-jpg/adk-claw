@@ -43,14 +43,16 @@
             margin-bottom: 8px;
             font-weight: 500;
         }
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
+            background: white;
+            appearance: auto;
         }
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -77,30 +79,141 @@
         .status.missing { background: #f8d7da; color: #721c24; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+        /* Toast 通知 */
+        #toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #27ae60;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            opacity: 0;
+            transform: translateY(-16px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 实时状态指示器 */
+        .live-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .live-dot.green { background: #27ae60; animation: pulse 1.5s infinite; }
+        .live-dot.red { background: #e74c3c; }
+        .live-dot.grey { background: #bdc3c7; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* OAuth 引导折叠面板 */
+        .guide-toggle {
+            background: none;
+            border: 1px solid #667eea;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transform: none;
+        }
+        .guide-toggle:hover { background: #f0f0ff; transform: none; }
+        .guide-content {
+            display: none;
+            background: #f8f9ff;
+            border: 1px solid #e0e0ff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.7;
+        }
+        .guide-content.open { display: block; }
+        .guide-content ol { padding-left: 20px; }
+        .guide-content li { margin-bottom: 8px; }
+        .guide-content code {
+            background: #e8e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        /* redirect URI 提示框 */
+        .redirect-uri-box {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #7c5c00;
+        }
+        .redirect-uri-box code {
+            display: block;
+            margin-top: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+            color: #333;
+        }
+        .copy-btn {
+            background: #f0a500;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 6px;
+            transform: none;
+        }
+        .copy-btn:hover { background: #d4900a; transform: none; }
     </style>
 </head>
 <body>
+    <!-- Toast 通知 -->
+    <div id="toast"></div>
+
     <div class="container">
         <h1>🦞 ADK Claw</h1>
-        
+
         <!-- 模型配置 -->
         <div class="card">
             <h2>🤖 模型配置</h2>
             <form action="/api/model" method="post">
                 <div class="form-group">
                     <label>选择模型</label>
-                    <select name="model" style="width:100%;padding:12px;border-radius:8px;">
-                        <option value="gemini-3.1-flash" {% if config.model == "gemini-3.1-flash" %}selected{% endif %}>Gemini 3.1 Flash（推荐）</option>
-                        <option value="gemini-3.1-flash-lite-preview" {% if config.model == "gemini-3.1-flash-lite-preview" %}selected{% endif %}>Gemini 3.1 Flash Lite（极低成本）</option>
-                        <option value="openai/gpt-4o" {% if config.model == "openai/gpt-4o" %}selected{% endif %}>GPT-4o</option>
-                        <option value="anthropic/claude-3.5-sonnet" {% if config.model == "anthropic/claude-3.5-sonnet" %}selected{% endif %}>Claude 3.5 Sonnet</option>
-                        <option value="deepseek/deepseek-chat" {% if config.model == "deepseek/deepseek-chat" %}selected{% endif %}>DeepSeek</option>
+                    <select name="model">
+                        <option value="gemini-3.1-flash" {% if config["model"] == "gemini-3.1-flash" %}selected{% endif %}>Gemini 3.1 Flash（推荐）</option>
+                        <option value="gemini-3.1-flash-lite-preview" {% if config["model"] == "gemini-3.1-flash-lite-preview" %}selected{% endif %}>Gemini 3.1 Flash Lite（极低成本）</option>
+                        <option value="openai/gpt-4o" {% if config["model"] == "openai/gpt-4o" %}selected{% endif %}>GPT-4o</option>
+                        <option value="anthropic/claude-3.5-sonnet" {% if config["model"] == "anthropic/claude-3.5-sonnet" %}selected{% endif %}>Claude 3.5 Sonnet</option>
+                        <option value="deepseek/deepseek-chat" {% if config["model"] == "deepseek/deepseek-chat" %}selected{% endif %}>DeepSeek</option>
                     </select>
                 </div>
                 <button type="submit">保存</button>
             </form>
         </div>
-        
+
         <!-- API Keys -->
         <div class="card">
             <h2>🔑 API Keys</h2>
@@ -125,10 +238,12 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Slack 配置 -->
         <div class="card">
-            <h2>💬 Slack <span class="status {% if slack_enabled %}ok{% else %}missing{% endif %}">{% if slack_enabled %}已启用{% else %}未启用{% endif %}</span></h2>
+            <h2>💬 Slack <span class="status {% if slack_enabled %}ok{% else %}missing{% endif %}">{% if slack_enabled %}已启用{% else %}未启用{% endif %}</span>
+                <span id="slack-live" style="margin-left:8px;font-size:13px;color:#888;"></span>
+            </h2>
             <form action="/api/slack" method="post">
                 <div class="grid">
                     <div class="form-group">
@@ -143,32 +258,57 @@
                 <button type="submit">保存并启用</button>
             </form>
         </div>
-        
+
         <!-- Telegram 配置 -->
         <div class="card">
-            <h2>📱 Telegram <span class="status {% if telegram_enabled %}ok{% else %}missing{% endif %}">{% if telegram_enabled %}已启用{% else %}未启用{% endif %}</span></h2>
+            <h2>📱 Telegram <span class="status {% if telegram_enabled %}ok{% else %}missing{% endif %}">{% if telegram_enabled %}已启用{% else %}未启用{% endif %}</span>
+                <span id="telegram-live" style="margin-left:8px;font-size:13px;color:#888;"></span>
+            </h2>
             <form action="/api/telegram" method="post">
                 <div class="form-group">
-                    <label>Bot Token (从 @BotFather 获取)</label>
+                    <label>Bot Token（从 @BotFather 获取）</label>
                     <input type="password" name="token" placeholder="123456:ABC...">
                 </div>
                 <button type="submit">保存并启用</button>
             </form>
             <p style="margin-top:12px;color:#666;font-size:13px;">
-                💡 获取 Token: Telegram 搜索 @BotFather → /newbot
+                💡 获取 Token：Telegram 搜索 @BotFather → /newbot
             </p>
         </div>
-        
+
         <!-- Google OAuth -->
         <div class="card">
             <h2>🔐 Google OAuth（可选）</h2>
-            <p style="color:#666;margin-bottom:16px;font-size:13px;">
+            <p style="color:#666;margin-bottom:12px;font-size:13px;">
                 用于访问 Gmail、Calendar、Drive 等需要用户授权的服务
             </p>
+
+            <!-- 动态 Redirect URI 提示 -->
+            <div class="redirect-uri-box">
+                ⚠️ 在 Google Cloud Console 创建凭证时，请将以下地址填入<strong>已获授权的重定向 URI</strong>：
+                <code id="redirect-uri-display">正在检测...</code>
+                <button class="copy-btn" onclick="copyRedirectUri(event)">复制</button>
+            </div>
+
+            <!-- OAuth 配置引导 -->
+            <button class="guide-toggle" type="button" onclick="toggleGuide()">📖 如何创建 Google OAuth 凭证？</button>
+            <div class="guide-content" id="oauth-guide">
+                <ol>
+                    <li>访问 <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>，选择或新建一个项目。</li>
+                    <li>点击左侧菜单 <strong>OAuth consent screen</strong>，选择 <strong>External</strong>，填写应用名称和邮箱后保存。</li>
+                    <li>点击左侧菜单 <strong>Library</strong>，搜索并启用以下 API：<br>
+                        <code>Gmail API</code>、<code>Google Calendar API</code>、<code>Google Drive API</code>、<code>Google Sheets API</code>、<code>Google Docs API</code>
+                    </li>
+                    <li>回到 <strong>Credentials</strong> 页面，点击 <strong>+ CREATE CREDENTIALS → OAuth client ID</strong>。</li>
+                    <li>应用类型选择 <strong>Web application</strong>，在 <strong>Authorized redirect URIs</strong> 中粘贴上方的重定向地址。</li>
+                    <li>点击 <strong>Create</strong>，复制弹出的 <strong>Client ID</strong> 和 <strong>Client Secret</strong> 填入下方表单。</li>
+                </ol>
+            </div>
+
             <form action="/api/google-oauth" method="post">
                 <div class="grid">
                     <div class="form-group">
-                        <label>Client ID</label>
+                        <label>Client ID <span class="status {% if oauth_configured %}ok{% else %}missing{% endif %}">{% if oauth_configured %}已配置{% else %}未配置{% endif %}</span></label>
                         <input type="text" name="client_id" placeholder="xxx.apps.googleusercontent.com">
                     </div>
                     <div class="form-group">
@@ -177,22 +317,119 @@
                     </div>
                 </div>
                 <button type="submit">保存</button>
+                {% if oauth_configured %}
+                <a href="/oauth/authorize" style="margin-left:12px;color:#667eea;font-size:14px;text-decoration:none;">
+                    {% if oauth_authorized %}🔄 重新授权{% else %}🔑 前往授权{% endif %}
+                </a>
+                {% endif %}
             </form>
-            <p style="margin-top:12px;color:#666;font-size:13px;">
-                💡 创建 OAuth 凭证: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>
-            </p>
         </div>
-        
+
         <!-- 状态 -->
         <div class="card">
             <h2>📊 状态</h2>
-            <div style="font-family:monospace;background:#f5f5f5;padding:12px;border-radius:8px;">
+            <div style="font-family:monospace;background:#f5f5f5;padding:12px;border-radius:8px;line-height:1.8;">
                 <p>✅ 配置目录: ~/.adk-claw/</p>
-                <p>🤖 模型: {{ config.model }}</p>
-                <p>💬 Slack: {% if slack_enabled %}✅ 已连接{% else %}❌ 未配置{% endif %}</p>
-                <p>📱 Telegram: {% if telegram_enabled %}✅ 已连接{% else %}❌ 未配置{% endif %}</p>
+                <p>🤖 模型: {{ config["model"] }}</p>
+                <p>💬 Slack: {% if slack_enabled %}<span id="slack-status-text">✅ 已启用</span>{% else %}❌ 未配置{% endif %}</p>
+                <p>📱 Telegram: {% if telegram_enabled %}<span id="telegram-status-text">✅ 已启用</span>{% else %}❌ 未配置{% endif %}</p>
+                <p>🔐 Google OAuth: {% if oauth_authorized %}✅ 已授权{% elif oauth_configured %}⚠️ 已配置（待授权）{% else %}❌ 未配置{% endif %}</p>
             </div>
         </div>
     </div>
+
+    <script>
+        // ── Toast 通知 ──────────────────────────────────────────
+        const TOAST_MESSAGES = {
+            model:     "✅ 模型已保存！",
+            google:    "✅ Google API Key 已保存！",
+            openai:    "✅ OpenAI API Key 已保存！",
+            anthropic: "✅ Anthropic API Key 已保存！",
+            slack:     "✅ Slack 配置已保存并启用！",
+            telegram:  "✅ Telegram Bot 已保存并启用！",
+            oauth:     "✅ Google OAuth 凭证已保存！",
+            cleared:   "🗑️ OAuth Token 已清除。",
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3500);
+        }
+
+        (function checkSavedParam() {
+            const params = new URLSearchParams(window.location.search);
+            const saved = params.get("saved") || params.get("cleared");
+            if (saved && TOAST_MESSAGES[saved]) {
+                showToast(TOAST_MESSAGES[saved]);
+                // 清除 URL 参数，避免刷新重复弹出
+                history.replaceState(null, "", "/");
+            }
+        })();
+
+        // ── 动态 Redirect URI ────────────────────────────────────
+        (function setRedirectUri() {
+            const uri = window.location.origin + "/oauth/callback";
+            document.getElementById("redirect-uri-display").textContent = uri;
+        })();
+
+        function copyRedirectUri(e) {
+            e.preventDefault();
+            const uri = document.getElementById("redirect-uri-display").textContent;
+            navigator.clipboard.writeText(uri).then(() => showToast("📋 重定向地址已复制！"));
+        }
+
+        // ── OAuth 引导折叠 ───────────────────────────────────────
+        function toggleGuide() {
+            const guide = document.getElementById("oauth-guide");
+            guide.classList.toggle("open");
+        }
+
+        // ── 实时服务状态轮询 ─────────────────────────────────────
+        async function pollServiceStatus() {
+            try {
+                const res = await fetch("/api/status");
+                if (!res.ok) return;
+                const data = await res.json();
+
+                // Telegram
+                const tgLive = document.getElementById("telegram-live");
+                const tgText = document.getElementById("telegram-status-text");
+                if (tgLive) {
+                    if (data.telegram === "connected") {
+                        tgLive.innerHTML = '<span class="live-dot green"></span>运行中';
+                        if (tgText) tgText.textContent = "✅ 已连接";
+                    } else if (data.telegram === "error") {
+                        tgLive.innerHTML = '<span class="live-dot red"></span>连接失败';
+                        if (tgText) tgText.textContent = "⚠️ 连接失败";
+                    } else if (data.telegram === "disabled") {
+                        tgLive.innerHTML = '<span class="live-dot grey"></span>未启用';
+                    }
+                }
+
+                // Slack
+                const slackLive = document.getElementById("slack-live");
+                const slackText = document.getElementById("slack-status-text");
+                if (slackLive) {
+                    if (data.slack === "connected") {
+                        slackLive.innerHTML = '<span class="live-dot green"></span>运行中';
+                        if (slackText) slackText.textContent = "✅ 已连接";
+                    } else if (data.slack === "error") {
+                        slackLive.innerHTML = '<span class="live-dot red"></span>连接失败';
+                        if (slackText) slackText.textContent = "⚠️ 连接失败";
+                    } else if (data.slack === "disabled") {
+                        slackLive.innerHTML = '<span class="live-dot grey"></span>未启用';
+                    }
+                }
+            } catch (e) {
+                // 静默失败，不影响页面使用
+            }
+        }
+
+        // 页面加载后立即查询一次，之后每 10 秒轮询
+        pollServiceStatus();
+        setInterval(pollServiceStatus, 10000);
+    </script>
 </body>
 </html>

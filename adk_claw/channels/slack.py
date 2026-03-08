@@ -11,6 +11,7 @@ from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
 
 from .base import ChannelHandler
 from .formats import extract_internal_content
+from ..service_registry import set_status
 
 logger = logging.getLogger("adk_claw.channels.slack")
 
@@ -80,13 +81,20 @@ class SlackChannel(ChannelHandler):
                 )
         
         self.handler = AsyncSocketModeHandler(self.app, self.app_token)
-        await self.handler.start_async()
-        logger.info("Slack Bot 已启动")
+        set_status("slack", "starting")
+        try:
+            await self.handler.start_async()
+            set_status("slack", "connected")
+            logger.info("Slack Bot 已启动")
+        except Exception as e:
+            set_status("slack", "error", str(e))
+            raise
     
     async def stop(self):
         """停止 Slack Bot"""
         if self.handler:
             await self.handler.stop_async()
+        set_status("slack", "disabled")
         logger.info("Slack Bot 已停止")
 
 
