@@ -1,186 +1,308 @@
 # ADK Claw 🦞
 
-> 第一个基于原生 Google ADK 的开源 AI Agent 平台
+> **Native Google ADK Agent Platform**
+> **基于原生 Google ADK 的 AI Agent 平台**
+> **ネイティブ Google ADK エージェントプラットフォーム**
 
-## 特点
+[English](#english) | [中文](#中文) | [日本語](#日本語)
 
-- ✅ **原生 ADK** - 使用 Google Agent Development Kit
-- ✅ **多模型支持** - Gemini / GPT / Claude / DeepSeek / Ollama
-- ✅ **多渠道** - Slack / Telegram（更多即将推出）
-- ✅ **本地运行** - 零成本，数据不出本地
-- ✅ **交互式安装** - 类似 OpenClaw 的配置向导
-- ✅ **Web 配置界面** - 无需编辑配置文件
-- ✅ **OAuth 支持** - 集成 Google Workspace
+---
 
-## 快速开始
+<a name="english"></a>
+## English
 
-### 方式一：pip 安装（推荐）
+### The First Native Google ADK Agent Platform
+
+ADK Claw is the first open-source AI agent platform built on native Google Agent Development Kit (ADK). Designed for seamless integration with Google Workspace and Google Cloud Platform.
+
+### ✨ Key Features
+
+#### 🚀 Native ADK Advantages
+- **100% Native ADK** - Built on Google's official Agent Development Kit
+- **Google Workspace Integration** - Native support for Gmail, Calendar, Sheets, Docs
+- **GCP Optimized** - Seamless deployment on Cloud Run, Vertex AI integration
+- **Multi-Model Support** - Gemini / GPT / Claude / DeepSeek / Ollama
+- **Multi-Channel** - Slack / Telegram (more coming soon)
+- **Zero Configuration** - One-click OAuth for Google Workspace
+
+#### 🔗 Google Ecosystem Integration
+
+**Google Workspace (One-Click Setup)**
+```
+✅ Gmail          - Send, read, compose emails
+✅ Calendar       - Manage events and schedules
+✅ Sheets         - Read and write spreadsheets
+✅ Docs           - Create and edit documents
+✅ Drive          - Access files and folders
+```
+
+**Google Cloud Platform**
+```
+✅ Cloud Run      - One-command deployment
+✅ Vertex AI      - Native memory and RAG services
+✅ BigQuery       - Data analytics integration
+✅ Cloud Storage  - Artifact and file storage
+```
+
+#### 💡 Why ADK Claw?
+
+| Feature | ADK Claw | Traditional Frameworks |
+|---------|----------|----------------------|
+| **Google ADK Native** | ✅ 100% Native | ❌ Custom implementations |
+| **Google Workspace** | ✅ One-click OAuth | ⚠️ Manual configuration |
+| **GCP Deployment** | ✅ Optimized | ⚠️ Generic |
+| **Memory Services** | ✅ Vertex AI RAG | ⚠️ Third-party DBs |
+| **Multi-Model** | ✅ 100+ models | ⚠️ Limited |
+
+### 🚀 Quick Start
 
 ```bash
+# Install
 pip install adk-claw
+
+# Initialize
 adk-claw init
+
+# Start
+adk-claw run --telegram
 ```
 
-### 方式二：从源码安装
+### 📦 Deployment Options
+
+#### Option A: Local Deployment (Free)
+```bash
+# Local SQLite + FileArtifactService
+python3.10 -m adk_claw.cli run --telegram
+```
+- **Cost**: $0
+- **Storage**: SQLite (persistent)
+- **Privacy**: Data stays local
+
+#### Option B: Cloud Deployment (GCP Native)
+```bash
+# Cloud Run + Vertex AI Memory Bank
+gcloud run deploy adk-claw --source .
+```
+- **Cost**: ~$6-15/month
+- **Storage**: Vertex AI Memory Bank
+- **Features**: Semantic search, auto-scaling
+
+### 🎯 Use Cases
+
+1. **Personal Assistant** - Email, calendar, task management
+2. **Team Collaboration** - Shared workspace automation
+3. **Data Analysis** - BigQuery + Sheets integration
+4. **Customer Support** - Gmail + Calendar scheduling
+5. **Content Creation** - Docs + Drive integration
+
+---
+
+<a name="中文"></a>
+## 中文
+
+### 第一个原生 Google ADK Agent 平台
+
+ADK Claw 是第一个基于原生 Google Agent Development Kit (ADK) 的开源 AI Agent 平台。专为 Google Workspace 和 Google Cloud Platform 深度集成而设计。
+
+### ✨ 核心优势
+
+#### 🚀 原生 ADK 优势
+- **100% 原生 ADK** - 基于 Google 官方 Agent Development Kit
+- **Google Workspace 集成** - 原生支持 Gmail、Calendar、Sheets、Docs
+- **GCP 优化** - 在 Cloud Run 上无缝部署，Vertex AI 集成
+- **多模型支持** - Gemini / GPT / Claude / DeepSeek / Ollama
+- **多渠道** - Slack / Telegram（更多即将推出）
+- **零配置** - Google Workspace 一键 OAuth
+
+#### 🔗 Google 生态集成
+
+**Google Workspace（一键配置）**
+```
+✅ Gmail          - 发送、读取、撰写邮件
+✅ Calendar       - 管理事件和日程
+✅ Sheets         - 读写电子表格
+✅ Docs           - 创建和编辑文档
+✅ Drive          - 访问文件和文件夹
+```
+
+**Google Cloud Platform**
+```
+✅ Cloud Run      - 一键部署
+✅ Vertex AI      - 原生记忆和 RAG 服务
+✅ BigQuery       - 数据分析集成
+✅ Cloud Storage  - 文件和存储
+```
+
+#### 💡 为什么选择 ADK Claw？
+
+| 特性 | ADK Claw | 传统框架 |
+|------|----------|---------|
+| **原生 Google ADK** | ✅ 100% 原生 | ❌ 自定义实现 |
+| **Google Workspace** | ✅ 一键 OAuth | ⚠️ 手动配置 |
+| **GCP 部署** | ✅ 优化 | ⚠️ 通用 |
+| **记忆服务** | ✅ Vertex AI RAG | ⚠️ 第三方数据库 |
+| **多模型** | ✅ 100+ 模型 | ⚠️ 有限 |
+
+### 🚀 快速开始
 
 ```bash
-git clone https://github.com/tianxiao/adk-claw.git
-cd adk-claw
-pip install -e .
-adk-claw init
-```
+# 安装
+pip install adk-claw
 
-### 初始化向导
-
-运行 `adk-claw init` 后，会进入交互式配置：
-
-```
-🦞 ADK Claw - 智能 Agent 平台
-
-📋 检查环境...
-✅ Python 3.12.0
-
-📦 检查依赖...
-  ✅ google-adk
-  ✅ slack-bolt
-  ✅ python-telegram-bot
-  ✅ fastapi
-
-🔑 API 配置
-至少配置一个 API Key
-
-Google API Key [未配置]: ********************************
-✅ Google API Key 已保存
-
-📱 渠道配置
-至少配置一个渠道
-
-Telegram: ❌ 未配置
-配置 Telegram？ [y/N]: y
-Telegram Bot Token: ********************************
-✅ Telegram 已配置
-
-🤖 模型配置
- 1  gemini-3.1-flash   Google Gemini 3.1 Flash (推荐)
- 2  gemini-3.1-pro     Google Gemini 3.1 Pro
- 3  gpt-4o             OpenAI GPT-4o
- 4  claude-3-5-sonnet  Anthropic Claude 3.5 Sonnet
-
-选择模型 (当前: gemini-3.1-flash) [1]: 1
-✅ 模型已设置为 gemini-3.1-flash
-
-🎉 安装成功
-
-✅ 初始化完成！
-
-下一步：
-  adk-claw run --web      启动 Web UI
-  adk-claw run --telegram 启动 Telegram Bot
-  adk-claw run --all      启动所有服务
-```
-
-## CLI 命令
-
-| 命令 | 说明 | 类似 OpenClaw |
-|------|------|--------------|
-| `adk-claw init` | 初始化配置 | `openclaw setup` |
-| `adk-claw config` | 配置向导 | `openclaw configure` |
-| `adk-claw doctor` | 健康检查 | `openclaw doctor` |
-| `adk-claw run` | 启动服务 | `openclaw gateway` |
-| `adk-claw version` | 显示版本 | `openclaw --version` |
-
-### 详细用法
-
-```bash
 # 初始化
-adk-claw init                  # 交互式
-adk-claw init --non-interactive
+adk-claw init
 
-# 配置
-adk-claw config                # 全部配置
-adk-claw config --section api  # 仅 API
-adk-claw config --section channels  # 仅渠道
-adk-claw config --section model     # 仅模型
-
-# 健康检查
-adk-claw doctor
-
-# 运行
-adk-claw run --web             # Web UI (localhost:8080)
-adk-claw run --telegram        # Telegram Bot
-adk-claw run --slack           # Slack Bot
-adk-claw run --all             # 所有服务
-adk-claw run --web --port 3000 # 自定义端口
+# 启动
+adk-claw run --telegram
 ```
 
-## 渠道配置
+### 📦 部署方案
 
-### Telegram
+#### 方案 A：本地部署（免费）
+```bash
+# SQLite + FileArtifactService
+python3.10 -m adk_claw.cli run --telegram
+```
+- **费用**：¥0
+- **存储**：SQLite（持久化）
+- **隐私**：数据本地保存
 
-1. Telegram 搜索 @BotFather
-2. 发送 `/newbot`
-3. 按提示创建
-4. 复制 Token
+#### 方案 B：云端部署（GCP 原生）
+```bash
+# Cloud Run + Vertex AI Memory Bank
+gcloud run deploy adk-claw --source .
+```
+- **费用**：约 ¥40-100/月
+- **存储**：Vertex AI Memory Bank
+- **特性**：语义搜索、自动扩容
+
+### 🎯 应用场景
+
+1. **个人助理** - 邮件、日程、任务管理
+2. **团队协作** - 共享工作区自动化
+3. **数据分析** - BigQuery + Sheets 集成
+4. **客户支持** - Gmail + 日程安排
+5. **内容创作** - Docs + Drive 集成
+
+---
+
+<a name="日本語"></a>
+## 日本語
+
+### 初のネイティブ Google ADK エージェントプラットフォーム
+
+ADK Claw は、ネイティブ Google Agent Development Kit (ADK) で構築された最初のオープンソース AI エージェントプラットフォームです。Google Workspace と Google Cloud Platform とのシームレスな統合を実現。
+
+### ✨ 主な特徴
+
+#### 🚀 ネイティブ ADK の利点
+- **100% ネイティブ ADK** - Google公式 Agent Development Kit ベース
+- **Google Workspace 統合** - Gmail、Calendar、Sheets、Docs をネイティブサポート
+- **GCP 最適化** - Cloud Run でのシームレスなデプロイ、Vertex AI 統合
+- **マルチモデル対応** - Gemini / GPT / Claude / DeepSeek / Ollama
+- **マルチチャンネル** - Slack / Telegram（今後さらに追加）
+- **ゼロ設定** - Google Workspace のワンクリック OAuth
+
+#### 🔗 Google エコシステム統合
+
+**Google Workspace（ワンクリック設定）**
+```
+✅ Gmail          - メールの送信、読み取り、作成
+✅ Calendar       - イベントとスケジュール管理
+✅ Sheets         - スプレッドシートの読み書き
+✅ Docs           - ドキュメントの作成と編集
+✅ Drive          - ファイルとフォルダへのアクセス
+```
+
+**Google Cloud Platform**
+```
+✅ Cloud Run      - ワンコマンドデプロイ
+✅ Vertex AI      - ネイティブメモリと RAG サービス
+✅ BigQuery       - データ分析統合
+✅ Cloud Storage  - アーティファクトとファイルストレージ
+```
+
+#### 💡 なぜ ADK Claw？
+
+| 機能 | ADK Claw | 従来のフレームワーク |
+|------|----------|-------------------|
+| **ネイティブ Google ADK** | ✅ 100% ネイティブ | ❌ カスタム実装 |
+| **Google Workspace** | ✅ ワンクリック OAuth | ⚠️ 手動設定 |
+| **GCP デプロイ** | ✅ 最適化 | ⚠️ 汎用 |
+| **メモリサービス** | ✅ Vertex AI RAG | ⚠️ サードパーティ DB |
+| **マルチモデル** | ✅ 100+ モデル | ⚠️ 限定 |
+
+### 🚀 クイックスタート
 
 ```bash
-adk-claw config --section channels
-# 选择配置 Telegram，粘贴 Token
+# インストール
+pip install adk-claw
+
+# 初期化
+adk-claw init
+
+# 起動
+adk-claw run --telegram
 ```
 
-### Slack
+### 📦 デプロイオプション
 
-1. 访问 https://api.slack.com/apps
-2. Create New App → From scratch
-3. **OAuth & Permissions** → 添加：
-   - `app_mentions:read`
-   - `chat:write`
-   - `channels:history`
-4. **Socket Mode** → Enable → 生成 App Token
-5. **Event Subscriptions** → `app_mention`
-6. Install to Workspace
-7. 复制 Tokens
-
+#### オプション A：ローカルデプロイ（無料）
 ```bash
-adk-claw config --section channels
-# 选择配置 Slack，粘贴 Bot Token 和 App Token
+# SQLite + FileArtifactService
+python3.10 -m adk_claw.cli run --telegram
 ```
+- **コスト**：¥0
+- **ストレージ**：SQLite（永続化）
+- **プライバシー**：データはローカル
 
-## 换模型
-
+#### オプション B：クラウドデプロイ（GCP ネイティブ）
 ```bash
-adk-claw config --section model
+# Cloud Run + Vertex AI Memory Bank
+gcloud run deploy adk-claw --source .
 ```
+- **コスト**：約 $6-15/月
+- **ストレージ**：Vertex AI Memory Bank
+- **機能**：セマンティック検索、自動スケーリング
 
-或编辑 `~/.adk-claw/config.json`：
+### 🎯 ユースケース
 
-```json
-{
-  "model": "gemini-3.1-flash"
-}
-```
+1. **パーソナルアシスタント** - メール、カレンダー、タスク管理
+2. **チームコラボレーション** - 共有ワークスペース自動化
+3. **データ分析** - BigQuery + Sheets 統合
+4. **カスタマーサポート** - Gmail + カレンダー予約
+5. **コンテンツ作成** - Docs + Drive 統合
 
-支持的模型：
-- `gemini-3.1-flash`（推荐，免费）
-- `gemini-3.1-flash-lite-preview`（极低成本）
-- `gemini-3.1-pro`
-- `gpt-4o`
-- `claude-3-5-sonnet`
-- `deepseek-chat`
-- `ollama/llama3.1`（本地）
+---
 
-## 添加工具
+## CLI Commands / CLI 命令 / CLI コマンド
 
-编辑 `agent.py`：
+| Command | Description | 说明 | 説明 |
+|---------|-------------|------|------|
+| `adk-claw init` | Initialize configuration | 初始化配置 | 初期化 |
+| `adk-claw config` | Configuration wizard | 配置向导 | 設定ウィザード |
+| `adk-claw doctor` | Health check | 健康检查 | ヘルスチェック |
+| `adk-claw run` | Start services | 启动服务 | サービス起動 |
+| `adk-claw oauth-status` | Check OAuth status | 查看 OAuth 状态 | OAuth 状態確認 |
 
-```python
-def my_tool(param: str) -> str:
-    """工具描述"""
-    return "结果"
+## Supported Models / 支持的模型 / 対応モデル
 
-TOOLS.append(FunctionTool(func=my_tool))
-```
+### Gemini 3.1 (Latest)
+- `gemini-3.1-pro` - Most intelligent
+- `gemini-3.1-flash` - Fast and efficient (Recommended)
+- `gemini-3.1-flash-lite-preview` - Ultra-low cost
 
-## 架构
+### Gemini 3 (Preview)
+- `gemini-3-pro` - Advanced multimodal understanding
+- `gemini-3-flash` - Excellent performance at low cost
+
+### Other Providers
+- **OpenAI**: GPT-4.1, GPT-4o, O3-mini
+- **Anthropic**: Claude 3.7 Sonnet, Claude 3.5 Sonnet
+- **DeepSeek**: DeepSeek Chat, DeepSeek Reasoner
+- **Local**: Ollama (Llama 3.3, Qwen 2.5, Gemma 3)
+
+## Architecture / 架构 / アーキテクチャ
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -189,216 +311,53 @@ TOOLS.append(FunctionTool(func=my_tool))
                  ↓
 ┌─────────────────────────────────────────────┐
 │  Web UI (localhost:8080)                    │
-│  - 配置 API Keys                            │
-│  - OAuth 认证                               │
+│  - OAuth Configuration                      │
+│  - Google Workspace Setup                   │
 └────────────────┬────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────────────┐
-│  ADK Claw Core                              │
+│  ADK Claw Core (Native ADK)                 │
 │  - Google ADK Agent                         │
-│  - 多渠道适配器                             │
+│  - Multi-Channel Adapters                   │
+│  - Google Workspace Tools                   │
 └────────┬────────────────────┬───────────────┘
          ↓                    ↓
     Slack (Socket)      Telegram (Polling)
+         ↓                    ↓
+┌─────────────────────────────────────────────┐
+│  Google Services                            │
+│  - Gmail / Calendar / Sheets / Docs         │
+│  - Vertex AI Memory Bank                    │
+│  - Cloud Storage                            │
+└─────────────────────────────────────────────┘
 ```
 
-## 部署方案
-
-ADK Claw 提供两种部署方案，满足不同场景需求：
-
-### 方案 A：本地部署（推荐个人/小团队）
-
-**特点：完全免费、数据本地、适合开发测试**
-
-| 组件 | 技术方案 | 持久化 | 费用 |
-|------|---------|--------|------|
-| **Memory** | SQLite + FTS | ✅ 本地持久化 | $0 |
-| **Artifacts** | FileArtifactService (ADK 原生) | ✅ 本地文件 | $0 |
-| **Sessions** | InMemorySessionService (ADK 原生) | ❌ 重启丢失 | $0 |
-
-**架构：**
-```
-┌─────────────────────────────────────────┐
-│  本地机器 (Mac/Linux/Windows)           │
-│  ├── ADK Claw Bot                       │
-│  ├── SQLite (~/.adk-claw/memory.db)     │
-│  └── FileArtifactService                │
-└─────────────────────────────────────────┘
-```
-
-**优点：**
-- ✅ 完全免费
-- ✅ 数据不出本地（隐私）
-- ✅ 持久化记忆（SQLite）
-- ✅ 快速开发调试
-
-**缺点：**
-- ❌ 需要本地机器一直开机
-- ❌ 记忆搜索仅关键词匹配（无语义理解）
-
-**启动命令：**
-```bash
-python3.10 -m adk_claw.cli run --telegram
-```
-
----
-
-### 方案 B：云端部署（推荐企业/团队）
-
-**特点：完全 ADK 原生、企业级、语义搜索**
-
-| 组件 | 技术方案 | 持久化 | 费用 |
-|------|---------|--------|------|
-| **Memory** | VertexAiMemoryBankService (ADK 原生) | ✅ 云端 | ~$1-20/月 |
-| **Artifacts** | GcsArtifactService (ADK 原生) | ✅ GCS | ~$0.1/月 |
-| **Sessions** | VertexAiSessionService (ADK 原生) | ✅ 云端 | 包含在 Memory 中 |
-
-**架构：**
-```
-┌─────────────────────────────────────────┐
-│  Cloud Run 容器                          │
-│  ├── ADK Claw Bot                       │
-│  └── ADK 原生服务                        │
-└─────────────────────────────────────────┘
-         ↓
-┌─────────────────────────────────────────┐
-│  GCP 服务                                │
-│  ├── Vertex AI Memory Bank              │
-│  ├── Cloud Storage (GCS)                │
-│  └── Vertex AI Session                  │
-└─────────────────────────────────────────┘
-```
-
-**优点：**
-- ✅ 完全 ADK 原生（无需自己实现存储）
-- ✅ 语义搜索（理解用户意图）
-- ✅ 24/7 在线（Cloud Run）
-- ✅ 企业级 SLA
-
-**缺点：**
-- ❌ 需要付费（~$1-20/月，视使用量）
-- ❌ 需要 GCP 账号配置
-
-**费用估算（10人团队）：**
-| 项目 | 月费用 |
-|------|--------|
-| Cloud Run (1 vCPU, 512MB) | ~$5-10 |
-| Vertex AI Memory Bank | ~$1-5 |
-| Cloud Storage (1GB) | ~$0.02 |
-| **总计** | **~$6-15/月** |
-
-**部署命令：**
-```bash
-# 1. 配置 GCP
-gcloud config set project your-project-id
-
-# 2. 部署到 Cloud Run
-gcloud run deploy adk-claw \
-  --source . \
-  --region asia-northeast1 \
-  --allow-unauthenticated \
-  --set-env-vars "GOOGLE_API_KEY=xxx,TELEGRAM_BOT_TOKEN=xxx"
-```
-
----
-
-### 方案对比总结
-
-| 维度 | 方案 A（本地） | 方案 B（云端） |
-|------|---------------|---------------|
-| **费用** | **$0** | ~$6-15/月 |
-| **记忆搜索** | 关键词匹配 | **语义理解** |
-| **可用性** | 需本地开机 | **24/7 在线** |
-| **隐私** | **数据本地** | 数据在 GCP |
-| **适合场景** | 个人/开发/测试 | 企业/团队/生产 |
-| **ADK 原生** | 部分（Artifacts/Sessions） | **完全原生** |
-
-**推荐：**
-- 🏠 **个人使用** → 方案 A（本地部署）
-- 🏢 **企业团队** → 方案 B（云端部署）
-
----
-
-## 与其他方案对比
-
-| 维度 | ADK Claw | OpenClaw | PocketPaw |
-|------|----------|----------|-----------|
-| 基础技术 | 原生 ADK | Anthropic | 多后端 |
-| 多模型 | ✅ 100+ | ❌ 仅 Claude | ✅ |
-| Google 生态 | ✅ 深度集成 | ⚠️ 需配置 | ⚠️ 假 ADK |
-| 本地部署 | ✅ 完全本地 | ✅ | ✅ |
-| 安装体验 | ✅ 交互式 | ✅ 交互式 | ⚠️ 手动 |
-| 开源 | ✅ MIT | ✅ | ✅ |
-
-## 路线图
-
-- [x] MVP - Slack/Telegram 支持
-- [x] Web 配置界面
-- [x] 多模型支持
-- [x] 记忆系统（SQLite + FTS）
-- [x] CLI 安装向导
-- [x] 网络搜索工具 (DuckDuckGo)
-- [ ] 向量搜索（嵌入向量）
-- [x] 图片理解（支持 Telegram）
-- [ ] 图片理解（Slack）
-- [ ] 更多工具（Gmail/Calendar/Drive）
-- [ ] Cloud Run 部署
-- [ ] 更多渠道（Discord/WhatsApp）
-
-## 记忆系统
-
-ADK Claw 内置记忆系统，可以记住和回忆信息：
-
-```
-用户：记住我喜欢简洁的回复
-Bot：✅ 已记住：你喜欢简洁的回复
-
-用户：我喜欢什么？
-Bot：📚 相关记忆：
-- 你喜欢简洁的回复
-```
-
-### 存储位置
-
-**方案 A（本地）：**
-```
-~/.adk-claw/
-├── config.json      # 配置
-├── secrets.json     # 密钥
-├── memory.db        # SQLite 记忆数据库
-└── artifacts/       # 文件存储
-```
-
-**方案 B（云端）：**
-```
-GCP Vertex AI Memory Bank  # 语义记忆
-GCP Cloud Storage          # 文件存储
-```
-
-## 开发
+## Development / 开发 / 開発
 
 ```bash
-# 安装开发依赖
+# Install development dependencies
 pip install -e ".[dev]"
 
-# 运行测试
+# Run tests
 pytest
 
-# 代码格式化
+# Code formatting
 ruff format .
 
-# 类型检查
+# Type checking
 mypy .
 ```
 
-## 贡献
+## Contributing / 贡献 / 貢献
 
-欢迎贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md)
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
-## License
+## License / 许可证 / ライセンス
 
 MIT
 
 ---
 
-**ADK Claw** - 第一个原生 ADK Agent 平台 🦞
+**ADK Claw** - Native Google ADK Agent Platform 🦞
+**ADK Claw** - 原生 Google ADK Agent 平台 🦞
+**ADK Claw** - ネイティブ Google ADK エージェントプラットフォーム 🦞
