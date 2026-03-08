@@ -9,6 +9,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 from .base import ChannelHandler
 from .formats import extract_internal_content
+from ..service_registry import set_status
 
 logger = logging.getLogger("adk_claw.channels.telegram")
 
@@ -39,9 +40,15 @@ class TelegramChannel(ChannelHandler):
         self.app.add_handler(MessageHandler(filters.PHOTO, self._handle_photo))
         
         logger.info("Telegram Bot 启动中...")
-        await self.app.initialize()
-        await self.app.start()
-        await self.app.updater.start_polling()
+        set_status("telegram", "starting")
+        try:
+            await self.app.initialize()
+            await self.app.start()
+            await self.app.updater.start_polling()
+            set_status("telegram", "connected")
+        except Exception as e:
+            set_status("telegram", "error", str(e))
+            raise
     
     async def stop(self):
         """停止 Telegram Bot"""
@@ -49,6 +56,7 @@ class TelegramChannel(ChannelHandler):
             await self.app.updater.stop()
             await self.app.stop()
             await self.app.shutdown()
+            set_status("telegram", "disabled")
             logger.info("Telegram Bot 已停止")
     
     # ========================================

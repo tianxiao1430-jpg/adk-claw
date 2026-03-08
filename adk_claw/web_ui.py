@@ -268,6 +268,21 @@ async def oauth_callback(
         )
 
 
+@app.get("/api/status")
+async def service_status():
+    """获取各渠道实时运行状态（供前端轮询）"""
+    from .service_registry import get_all as registry_get_all
+    status = registry_get_all()
+
+    # 对未注册的渠道，根据配置返回 disabled
+    if "telegram" not in status:
+        status["telegram"] = "connected" if config.is_telegram_enabled() else "disabled"
+    if "slack" not in status:
+        status["slack"] = "connected" if config.is_slack_enabled() else "disabled"
+
+    return JSONResponse(status)
+
+
 @app.get("/api/oauth/status")
 async def oauth_status():
     """获取 OAuth 状态（JSON API）"""
@@ -292,7 +307,7 @@ async def oauth_clear():
 # 启动
 # ============================================
 
-def start_web_ui(host: str = "localhost", port: int = 8080):
+def start_web_ui(host: str = "0.0.0.0", port: int = 8080):
     """启动 Web UI"""
     print(f"🌐 Web UI: http://{host}:{port}")
     uvicorn.run(app, host=host, port=port, log_level="warning")
