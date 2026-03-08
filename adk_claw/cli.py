@@ -184,7 +184,7 @@ def init(non_interactive: bool):
 
 
 @cli.command()
-@click.option("--section", type=click.Choice(["api", "channels", "model", "all"]), default="all")
+@click.option("--section", type=click.Choice(["api", "channels", "model", "oauth", "all"]), default="all")
 def config(section: str):
     """配置向导（类似 openclaw configure）"""
     print_banner()
@@ -224,6 +224,10 @@ def run_config_wizard(section: str = "all"):
 
         console.print()
 
+    # OAuth (Google Workspace)
+    if section in ["oauth", "all"]:
+        run_oauth_config(app_config)
+
     # Channels
     if section in ["channels", "all"]:
         console.print("[bold]📱 渠道配置[/bold]")
@@ -258,6 +262,209 @@ def run_config_wizard(section: str = "all"):
     # Model
     if section in ["model", "all"]:
         run_model_selection(app_config)
+
+
+def run_oauth_config(app_config):
+    """配置 Google OAuth"""
+    from .auth import token_manager
+
+    console.print("[bold]🔐 Google Workspace OAuth 配置[/bold]")
+    console.print("[dim]用于 Gmail/Calendar/Sheets/Docs 集成[/dim]")
+    console.print()
+
+    # 检查当前状态
+    client_id = app_config.get_google_oauth_client_id()
+    client_secret = app_config.get_google_oauth_client_secret()
+    tokens = token_manager.get_google_tokens()
+
+    # 显示状态
+    if client_id and client_secret:
+        if tokens:
+            console.print("[green]  ✅ OAuth 已配置并授权[/green]")
+        else:
+            console.print("[yellow]  ⚠️  OAuth 凭证已配置，但未授权[/yellow]")
+    else:
+        console.print("[red]  ❌ OAuth 未配置[/red]")
+
+    console.print()
+
+    # 询问是否配置
+    if not Confirm.ask("配置 Google OAuth？", default=not client_id):
+        console.print()
+        return
+
+    console.print()
+    console.print("[cyan]📋 配置步骤：[/cyan]")
+    console.print("  1. 访问 https://console.cloud.google.com")
+    console.print("  2. 创建 OAuth 2.0 客户端 ID（Desktop app 类型）")
+    console.print("  3. 添加授权重定向 URI: http://localhost:8080/oauth/callback")
+    console.print("  4. 复制 Client ID 和 Client Secret")
+    console.print()
+
+    # 输入凭证
+    client_id_input = Prompt.ask(
+        "Google OAuth Client ID",
+        default=client_id or ""
+    )
+
+    client_secret_input = Prompt.ask(
+        "Google OAuth Client Secret",
+        default=client_secret or ""
+    )
+
+    if client_id_input and client_secret_input:
+        # 保存凭证
+        app_config.set_google_oauth(client_id_input, client_secret_input)
+        console.print("[green]✅ OAuth 凭证已保存[/green]")
+        console.print()
+
+        # 询问是否立即授权
+        if Confirm.ask("现在进行 OAuth 授权？", default=True):
+            console.print()
+            run_oauth_authorization(client_id_input, client_secret_input)
+
+    console.print()
+
+
+def run_oauth_authorization(client_id: str, client_secret: str):
+    """运行 OAuth 授权流程"""
+    from .auth import OAuthFlow, token_manager
+
+    console.print("[bold]🌐 启动 OAuth 授权流程[/bold]")
+    console.print()
+
+    # 创建 OAuth 流程
+    flow = OAuthFlow(client_id, client_secret)
+
+    # 提示用户
+    console.print("[yellow]⚠️  请按以下步骤操作：[/yellow]")
+    console.print("  1. 浏览器将自动打开 Google 授权页面")
+    console.print("  2. 登录您的 Google 账号")
+    console.print("  3. 授权 ADK Claw 访问您的 Google Workspace")
+    console.print("  4. 授权成功后会自动跳转到 localhost:8080")
+    console.print()
+
+    if not Confirm.ask("准备好了吗？", default=True):
+        console.print("[yellow]已取消授权。稍后运行 [bold]adk-claw oauth-authorize[/bold] 进行授权。[/yellow]")
+        return
+
+    # 启动 Web UI（后台）
+    console.print("[cyan]启动本地服务器...[/cyan]")
+
+    # 保存 state 用于验证
+    import json
+    from pathlib import Path
+    state_file = Path.home() / ".adk-claw" / "oauth_state.json"
+    state_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(state_file, "w") as f:
+        json.dump({
+            "state": flow.state,
+            "client_id": client_id,
+            "client_secret": client_secret,
+        }, f)
+
+    # 打开浏览器
+    flow.start_authorization()
+
+    console.print()
+    console.print(Panel.fit(
+        "[yellow]⏳ 等待授权...[/yellow]\n\n"
+        "[dim]完成授权后，此页面会自动更新[/dim]\n\n"
+        "[cyan]如果没有自动打开浏览器，请访问：[/cyan]\n"
+        f"[link]{flow.get_authorization_url()}[/link]",
+        title="OAuth 授权",
+        border_style="yellow"
+    ))
+
+    console.print()
+    console.print("[dim]提示：授权完成后，运行 [bold]adk-claw oauth-status[/bold] 查看状态[/dim]")
+
+
+@cli.command()
+def oauth_authorize():
+    """启动 Google OAuth 授权流程"""
+    from .config import config as app_config
+
+    print_banner()
+    console.print()
+
+    client_id = app_config.get_google_oauth_client_id()
+    client_secret = app_config.get_google_oauth_client_secret()
+
+    if not client_id or not client_secret:
+        console.print("[red]❌ OAuth 凭证未配置[/red]")
+        console.print()
+        console.print("[cyan]请先运行：[/cyan]")
+        console.print("  [bold]adk-claw config --section oauth[/bold]")
+        return
+
+    run_oauth_authorization(client_id, client_secret)
+
+
+@cli.command()
+def oauth_status():
+    """查看 Google OAuth 状态"""
+    from .config import config as app_config
+    from .auth import token_manager
+
+    print_banner()
+    console.print()
+
+    console.print("[bold]🔐 Google OAuth 状态[/bold]")
+    console.print()
+
+    # 凭证状态
+    client_id = app_config.get_google_oauth_client_id()
+    client_secret = app_config.get_google_oauth_client_secret()
+
+    if client_id and client_secret:
+        console.print("[green]  ✅ OAuth 凭证已配置[/green]")
+        console.print(f"[dim]     Client ID: {client_id[:20]}...[/dim]")
+    else:
+        console.print("[red]  ❌ OAuth 凭证未配置[/red]")
+
+    # Token 状态
+    tokens = token_manager.get_google_tokens()
+
+    if tokens:
+        from datetime import datetime
+        expires_at = datetime.fromisoformat(tokens["expires_at"])
+        is_expired = token_manager.token_expired()
+
+        if is_expired:
+            console.print("[yellow]  ⚠️  Token 已过期（需要刷新）[/yellow]")
+        else:
+            console.print(f"[green]  ✅ Token 有效（过期时间: {expires_at.strftime('%Y-%m-%d %H:%M')}）[/green]")
+
+        console.print(f"[dim]     更新时间: {tokens['updated_at']}[/dim]")
+    else:
+        console.print("[red]  ❌ Token 未获取[/red]")
+
+    console.print()
+
+    # 可用服务
+    if client_id and client_secret and tokens and not token_manager.token_expired():
+        console.print("[bold]📦 可用服务：[/bold]")
+        console.print("  [green]✅ Gmail[/green] - 发送/读取邮件")
+        console.print("  [green]✅ Calendar[/green] - 管理日程")
+        console.print("  [green]✅ Sheets[/green] - 读写表格")
+        console.print("  [green]✅ Docs[/green] - 创建文档")
+        console.print()
+
+
+@cli.command()
+def oauth_clear():
+    """清除 Google OAuth Token"""
+    from .auth import token_manager
+
+    print_banner()
+    console.print()
+
+    if Confirm.ask("确定要清除 Google OAuth Token 吗？", default=False):
+        token_manager.clear_google_tokens()
+        console.print("[green]✅ Token 已清除[/green]")
+    else:
+        console.print("[yellow]已取消[/yellow]")
 
 
 def run_model_selection(app_config):
@@ -333,6 +540,7 @@ def doctor():
     console.print()
 
     from .config import config as app_config
+    from .auth import token_manager
 
     issues = []
 
@@ -368,6 +576,17 @@ def doctor():
     else:
         console.print("[yellow]  ⚠️  渠道未配置[/yellow]")
         issues.append("渠道未配置（仅 Web UI 可用）")
+
+    # OAuth
+    client_id = app_config.get_google_oauth_client_id()
+    tokens = token_manager.get_google_tokens()
+    if client_id and tokens:
+        console.print("[green]  ✅ Google Workspace 已配置[/green]")
+    elif client_id:
+        console.print("[yellow]  ⚠️  Google Workspace 凭证已配置，但未授权[/yellow]")
+        issues.append("Google Workspace 未授权")
+    else:
+        console.print("[dim]  ○ Google Workspace 未配置（可选）[/dim]")
 
     console.print()
 

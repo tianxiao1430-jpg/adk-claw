@@ -21,6 +21,9 @@ python-multipart>=0.0.6
 click>=8.1.0
 rich>=13.0.0
 
+# OAuth
+httpx>=0.25.0
+
 # 记忆系统
 requests>=2.31.0
 
