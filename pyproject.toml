@@ -7,7 +7,7 @@ name = "adk-claw"
 version = "0.1.0"
 description = "🦞 ADK Claw - 智能 Agent 平台，基于 Google ADK"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 authors = [
     {name = "Tianxiao", email = "tianxiao@example.com"}
@@ -16,7 +16,7 @@ keywords = ["ai", "agent", "adk", "gemini", "chatbot"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

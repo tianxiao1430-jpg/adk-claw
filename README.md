@@ -354,21 +354,27 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License / 许可证 / ライセンス
 
-**GPL v3 or later** - See [LICENSE](LICENSE)
+**Apache License 2.0** - See [LICENSE](LICENSE)
 
-This project is licensed under the GNU General Public License v3.0 or later.
+Copyright 2024 ADK Claw Contributors
 
-**Key Points / 关键点 / 重要な点:**
-- ✅ Free to use and modify / 免费使用和修改 / 無料で使用・改変可能
-- ✅ Modifications must be open source / 修改后必须开源 / 改変部分はオープンソース必須
-- ✅ Commercial use allowed / 允许商业使用 / 商用利用可能
-- ✅ Must preserve copyright / 必须保留版权 / 著作権表示必須
+Licensed under the Apache License, Version 2.0 (the "License");
 
-**In short: You can use it freely, but if you modify and distribute it, you must share your improvements with the community.**
+**What you can do / 你可以做的 / できること:**
+- ✅ Commercial use / 商业使用 / 商用利用
+- ✅ Modify / 修改 / 改変
+- ✅ Distribute / 分发 / 配布
+- ✅ Private use / 私人使用 / 私的利用
+- ✅ Sublicense / 再许可 / サブライセンス
 
-**简而言之：你可以自由使用，但如果修改并分发，必须与社区分享你的改进。**
+**What you must do / 你必须做的 / しなければならないこと:**
+- ✅ Preserve copyright notice / 保留版权声明 / 著作権表示の保持
+- ✅ Include copy of license / 包含许可证副本 / ライセンスのコピーを含める
+- ✅ State changes / 说明改动 / 変更点の記載
 
-**要するに：自由に使用できますが、改変して配布する場合は、改善点をコミュニティと共有する必要があります。**
+**What you cannot do / 你不能做的 / できないこと:**
+- ❌ Hold liable / 追究责任 / 責任を追及
+- ❌ Use trademarks / 使用商标 / 商標の使用
 
 ---
 
