@@ -266,7 +266,7 @@ def run_config_wizard(section: str = "all"):
 
 def run_oauth_config(app_config):
     """配置 Google OAuth"""
-    from .auth import token_manager
+    from .auth import token_manager, ADKCLAW_OFFICIAL_CLIENT_ID
 
     console.print("[bold]🔐 Google Workspace OAuth 配置[/bold]")
     console.print("[dim]用于 Gmail/Calendar/Sheets/Docs 集成[/dim]")
@@ -274,57 +274,78 @@ def run_oauth_config(app_config):
 
     # 检查当前状态
     client_id = app_config.get_google_oauth_client_id()
-    client_secret = app_config.get_google_oauth_client_secret()
     tokens = token_manager.get_google_tokens()
 
     # 显示状态
-    if client_id and client_secret:
-        if tokens:
-            console.print("[green]  ✅ OAuth 已配置并授权[/green]")
-        else:
-            console.print("[yellow]  ⚠️  OAuth 凭证已配置，但未授权[/yellow]")
-    else:
-        console.print("[red]  ❌ OAuth 未配置[/red]")
-
-    console.print()
-
-    # 询问是否配置
-    if not Confirm.ask("配置 Google OAuth？", default=not client_id):
+    if tokens:
+        console.print("[green]  ✅ Google Workspace 已授权[/green]")
         console.print()
+        console.print("[dim]已授权的服务：[/dim]")
+        console.print("[dim]  • Gmail - 发送/读取邮件[/dim]")
+        console.print("[dim]  • Calendar - 管理日程[/dim]")
+        console.print("[dim]  • Sheets - 读写表格[/dim]")
+        console.print("[dim]  • Docs - 创建文档[/dim]")
+        console.print()
+
+        if Confirm.ask("重新授权？", default=False):
+            run_oauth_authorization(client_id or ADKCLAW_OFFICIAL_CLIENT_ID, "")
         return
 
-    console.print()
-    console.print("[cyan]📋 配置步骤：[/cyan]")
-    console.print("  1. 访问 https://console.cloud.google.com")
-    console.print("  2. 创建 OAuth 2.0 客户端 ID（Desktop app 类型）")
-    console.print("  3. 添加授权重定向 URI: http://localhost:8080/oauth/callback")
-    console.print("  4. 复制 Client ID 和 Client Secret")
+    console.print("[yellow]  ○ Google Workspace 未启用[/yellow]")
     console.print()
 
-    # 输入凭证
-    client_id_input = Prompt.ask(
-        "Google OAuth Client ID",
-        default=client_id or ""
-    )
+    # 选择授权方式
+    console.print("[bold]选择授权方式：[/bold]")
+    console.print()
 
-    client_secret_input = Prompt.ask(
-        "Google OAuth Client Secret",
-        default=client_secret or ""
-    )
-
-    if client_id_input and client_secret_input:
-        # 保存凭证
-        app_config.set_google_oauth(client_id_input, client_secret_input)
-        console.print("[green]✅ OAuth 凭证已保存[/green]")
+    if ADKCLAW_OFFICIAL_CLIENT_ID:
+        console.print("  [cyan]1[/cyan]. 🚀 快速授权（推荐）")
+        console.print("      [dim]使用 ADKClaw 官方 Client ID，一键授权[/dim]")
         console.print()
 
-        # 询问是否立即授权
-        if Confirm.ask("现在进行 OAuth 授权？", default=True):
-            console.print()
-            run_oauth_authorization(client_id_input, client_secret_input)
-
+    console.print(f"  [cyan]{2 if ADKCLAW_OFFICIAL_CLIENT_ID else 1}[/cyan]. 🔧 自定义 Client ID（高级）")
+    console.print("      [dim]使用您自己的 Google Cloud 项目[/dim]")
     console.print()
 
+    choice = Prompt.ask(
+        "选择",
+        default="1" if ADKCLAW_OFFICIAL_CLIENT_ID else "2"
+    )
+
+    if choice == "1" and ADKCLAW_OFFICIAL_CLIENT_ID:
+        # 使用官方 Client ID
+        console.print()
+        console.print("[cyan]🌐 正在准备授权...[/cyan]")
+        run_oauth_authorization(ADKCLAW_OFFICIAL_CLIENT_ID, "")
+
+    else:
+        # 自定义 Client ID
+        console.print()
+        console.print(Panel.fit(
+            "[cyan]📋 创建 Google OAuth Client ID 步骤：[/cyan]\n\n"
+            "1. 访问 [link]https://console.cloud.google.com/apis/credentials[/link]\n"
+            "2. 点击 [bold]Create Credentials[/bold] → [bold]OAuth client ID[/bold]\n"
+            "3. 选择 [bold]Desktop app[/bold] 类型\n"
+            "4. 添加授权重定向 URI:\n"
+            "   [dim]http://localhost:8080/oauth/callback[/dim]\n"
+            "5. 复制 Client ID",
+            title="配置指南",
+            border_style="cyan"
+        ))
+        console.print()
+
+        client_id_input = Prompt.ask("Google OAuth Client ID")
+
+        if client_id_input:
+            # 保存 Client ID（不保存 secret，Desktop app 不需要）
+            app_config.set_google_oauth(client_id_input, "")
+            console.print("[green]✅ Client ID 已保存[/green]")
+            console.print()
+
+            if Confirm.ask("现在进行授权？", default=True):
+                run_oauth_authorization(client_id_input, "")
+
+    console.print()
 
 def run_oauth_authorization(client_id: str, client_secret: str):
     """运行 OAuth 授权流程"""
@@ -337,19 +358,20 @@ def run_oauth_authorization(client_id: str, client_secret: str):
     flow = OAuthFlow(client_id, client_secret)
 
     # 提示用户
-    console.print("[yellow]⚠️  请按以下步骤操作：[/yellow]")
-    console.print("  1. 浏览器将自动打开 Google 授权页面")
-    console.print("  2. 登录您的 Google 账号")
-    console.print("  3. 授权 ADK Claw 访问您的 Google Workspace")
-    console.print("  4. 授权成功后会自动跳转到 localhost:8080")
+    console.print(Panel.fit(
+        "[yellow]⚠️  请按以下步骤操作：[/yellow]\n\n"
+        "1. 浏览器将自动打开 Google 授权页面\n"
+        "2. 登录您的 Google 账号\n"
+        "3. 授权 ADK Claw 访问您的 Google Workspace\n"
+        "4. 授权成功后会自动跳转",
+        title="授权步骤",
+        border_style="yellow"
+    ))
     console.print()
 
     if not Confirm.ask("准备好了吗？", default=True):
         console.print("[yellow]已取消授权。稍后运行 [bold]adk-claw oauth-authorize[/bold] 进行授权。[/yellow]")
         return
-
-    # 启动 Web UI（后台）
-    console.print("[cyan]启动本地服务器...[/cyan]")
 
     # 保存 state 用于验证
     import json
@@ -364,13 +386,14 @@ def run_oauth_authorization(client_id: str, client_secret: str):
         }, f)
 
     # 打开浏览器
+    console.print("[cyan]正在打开浏览器...[/cyan]")
     flow.start_authorization()
 
     console.print()
     console.print(Panel.fit(
         "[yellow]⏳ 等待授权...[/yellow]\n\n"
-        "[dim]完成授权后，此页面会自动更新[/dim]\n\n"
-        "[cyan]如果没有自动打开浏览器，请访问：[/cyan]\n"
+        "[dim]完成授权后，页面会自动显示成功信息[/dim]\n\n"
+        "[cyan]如果没有自动打开浏览器，请手动访问：[/cyan]\n"
         f"[link]{flow.get_authorization_url()}[/link]",
         title="OAuth 授权",
         border_style="yellow"
@@ -378,6 +401,7 @@ def run_oauth_authorization(client_id: str, client_secret: str):
 
     console.print()
     console.print("[dim]提示：授权完成后，运行 [bold]adk-claw oauth-status[/bold] 查看状态[/dim]")
+
 
 
 @cli.command()
