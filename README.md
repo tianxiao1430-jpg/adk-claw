@@ -13,7 +13,7 @@
 
 ### The First Native Google ADK Agent Platform
 
-ADK Claw is the first open-source AI agent platform built on native Google Agent Development Kit (ADK). Designed for seamless integration with Google Workspace and Google Cloud Platform.
+ADK Claw is an open-source AI agent platform built on native Google Agent Development Kit (ADK). Designed for seamless integration with Google Workspace and Google Cloud Platform.
 
 ### ✨ Key Features
 
@@ -102,7 +102,7 @@ gcloud run deploy adk-claw --source .
 
 ### 第一个原生 Google ADK Agent 平台
 
-ADK Claw 是第一个基于原生 Google Agent Development Kit (ADK) 的开源 AI Agent 平台。专为 Google Workspace 和 Google Cloud Platform 深度集成而设计。
+ADK Claw 是基于原生 Google Agent Development Kit (ADK) 的开源 AI Agent 平台。专为 Google Workspace 和 Google Cloud Platform 深度集成而设计。
 
 ### ✨ 核心优势
 
@@ -191,7 +191,7 @@ gcloud run deploy adk-claw --source .
 
 ### 初のネイティブ Google ADK エージェントプラットフォーム
 
-ADK Claw は、ネイティブ Google Agent Development Kit (ADK) で構築された最初のオープンソース AI エージェントプラットフォームです。Google Workspace と Google Cloud Platform とのシームレスな統合を実現。
+ADK Claw は、ネイティブ Google Agent Development Kit (ADK) で構築されたオープンソース AI エージェントプラットフォームです。Google Workspace と Google Cloud Platform とのシームレスな統合を実現。
 
 ### ✨ 主な特徴
 
@@ -354,10 +354,24 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License / 许可证 / ライセンス
 
-MIT
+**GPL v3 or later** - See [LICENSE](LICENSE)
+
+This project is licensed under the GNU General Public License v3.0 or later.
+
+**Key Points / 关键点 / 重要な点:**
+- ✅ Free to use and modify / 免费使用和修改 / 無料で使用・改変可能
+- ✅ Modifications must be open source / 修改后必须开源 / 改変部分はオープンソース必須
+- ✅ Commercial use allowed / 允许商业使用 / 商用利用可能
+- ✅ Must preserve copyright / 必须保留版权 / 著作権表示必須
+
+**In short: You can use it freely, but if you modify and distribute it, you must share your improvements with the community.**
+
+**简而言之：你可以自由使用，但如果修改并分发，必须与社区分享你的改进。**
+
+**要するに：自由に使用できますが、改変して配布する場合は、改善点をコミュニティと共有する必要があります。**
 
 ---
 
-**ADK Claw** - Native Google ADK Agent Platform 🦞
-**ADK Claw** - 原生 Google ADK Agent 平台 🦞
+**ADK Claw** - Native Google ADK Agent Platform 🦞  
+**ADK Claw** - 原生 Google ADK Agent 平台 🦞  
 **ADK Claw** - ネイティブ Google ADK エージェントプラットフォーム 🦞
