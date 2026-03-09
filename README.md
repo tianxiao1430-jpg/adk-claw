@@ -11,7 +11,7 @@
 <a name="english"></a>
 ## English
 
-### The First Native Google ADK Agent Platform
+### Native Google ADK Agent Platform
 
 ADK Claw is an open-source AI agent platform built on native Google Agent Development Kit (ADK). Designed for seamless integration with Google Workspace and Google Cloud Platform.
 
@@ -100,7 +100,7 @@ gcloud run deploy adk-claw --source .
 <a name="中文"></a>
 ## 中文
 
-### 第一个原生 Google ADK Agent 平台
+### 原生 Google ADK Agent 平台
 
 ADK Claw 是基于原生 Google Agent Development Kit (ADK) 的开源 AI Agent 平台。专为 Google Workspace 和 Google Cloud Platform 深度集成而设计。
 
@@ -189,7 +189,7 @@ gcloud run deploy adk-claw --source .
 <a name="日本語"></a>
 ## 日本語
 
-### 初のネイティブ Google ADK エージェントプラットフォーム
+### ネイティブ Google ADK エージェントプラットフォーム
 
 ADK Claw は、ネイティブ Google Agent Development Kit (ADK) で構築されたオープンソース AI エージェントプラットフォームです。Google Workspace と Google Cloud Platform とのシームレスな統合を実現。
 
