@@ -16,7 +16,7 @@ try:
     from .config import config
     MODEL = config.get_model()
 except ImportError:
-    MODEL = os.environ.get("ADK_MODEL", "gemini-3.1-flash")
+    MODEL = os.environ.get("KUMA_MODEL", "gemini-3.1-flash")
 
 
 # ============================================
