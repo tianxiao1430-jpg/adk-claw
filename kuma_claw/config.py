@@ -9,7 +9,18 @@ from pathlib import Path
 from typing import Optional, Dict
 
 # 配置文件路径
+# 配置文件路径
+OLD_CONFIG_DIR = Path.home() / ".adk-claw"
 CONFIG_DIR = Path.home() / ".kuma-claw"
+
+if OLD_CONFIG_DIR.exists() and not CONFIG_DIR.exists():
+    import shutil
+    try:
+        shutil.copytree(str(OLD_CONFIG_DIR), str(CONFIG_DIR))
+        print(f"📦 [Kuma Claw] 自动迁移旧配置: {OLD_CONFIG_DIR} -> {CONFIG_DIR}")
+    except Exception as e:
+        print(f"⚠️ [Kuma Claw] 配置迁移失败: {e}")
+
 CONFIG_FILE = CONFIG_DIR / "config.json"
 SECRETS_FILE = CONFIG_DIR / "secrets.json"
 
