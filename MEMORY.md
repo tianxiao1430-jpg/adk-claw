@@ -1,4 +1,4 @@
-# ADK Claw 记忆系统
+# Kuma Claw 记忆系统
 
 ## 架构
 
@@ -22,7 +22,7 @@
 
 设计参考了 OpenClaw 的记忆系统：
 
-| 功能 | OpenClaw | ADK Claw |
+| 功能 | OpenClaw | Kuma Claw |
 |------|----------|----------|
 | 存储 | SQLite + 向量 | SQLite + FTS5 |
 | 搜索 | 混合（向量+FTS） | FTS（向量可选） |
@@ -71,7 +71,7 @@ memory_manager.set_embedding_provider(provider)
 ## 存储
 
 ```
-~/.adk-claw/
+~/.kuma-claw/
 ├── config.json      # 配置
 ├── secrets.json     # 密钥
 └── memory.db        # 记忆数据库

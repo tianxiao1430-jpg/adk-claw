@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "adk-claw"
+name = "kuma-claw"
 version = "0.1.0"
-description = "🦞 ADK Claw - 智能 Agent 平台，基于 Google ADK"
+description = "🦞 Kuma Claw - 智能 Agent 平台，基于 Google ADK"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
@@ -48,17 +48,17 @@ dev = [
 ]
 
 [project.scripts]
-adk-claw = "adk_claw.cli:cli"
+kuma-claw = "kuma_claw.cli:cli"
 
 [project.urls]
-Homepage = "https://github.com/tianxiao1430-jpg/adk-claw"
-Documentation = "https://github.com/tianxiao1430-jpg/adk-claw#readme"
-Repository = "https://github.com/tianxiao1430-jpg/adk-claw"
-Issues = "https://github.com/tianxiao1430-jpg/adk-claw/issues"
+Homepage = "https://github.com/tianxiao1430-jpg/kuma-claw"
+Documentation = "https://github.com/tianxiao1430-jpg/kuma-claw#readme"
+Repository = "https://github.com/tianxiao1430-jpg/kuma-claw"
+Issues = "https://github.com/tianxiao1430-jpg/kuma-claw/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["adk_claw*"]
+include = ["kuma_claw*"]
 
 [tool.black]
 line-length = 88

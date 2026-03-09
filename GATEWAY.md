@@ -1,4 +1,4 @@
-# ADK Claw Gateway 设计
+# Kuma Claw Gateway 设计
 
 ## 架构概览
 
@@ -212,22 +212,22 @@ GET  /memory/search       # 搜索记忆
 
 ```bash
 # 启动网关
-adk-claw gateway
+kuma-claw gateway
 
 # 后台运行
-adk-claw gateway --daemon
+kuma-claw gateway --daemon
 
 # 指定配置
-adk-claw gateway --config /path/to/config.json
+kuma-claw gateway --config /path/to/config.json
 
 # 开发模式（热重载）
-adk-claw gateway --dev
+kuma-claw gateway --dev
 ```
 
 ## 目录结构
 
 ```
-adk-claw/
+kuma-claw/
 ├── gateway/
 │   ├── __init__.py
 │   ├── server.py          # WebSocket 服务器
@@ -250,7 +250,7 @@ adk-claw/
 
 ## 对比 OpenClaw
 
-| 功能 | ADK Claw Gateway | OpenClaw Gateway |
+| 功能 | Kuma Claw Gateway | OpenClaw Gateway |
 |------|------------------|------------------|
 | 基础技术 | Python + WebSocket | Node.js + WebSocket |
 | Agent 框架 | Google ADK | Anthropic SDK |

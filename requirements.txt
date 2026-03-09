@@ -1,4 +1,4 @@
-# ADK Claw 依赖
+# Kuma Claw 依赖
 
 # Google ADK
 google-adk>=0.1.0
