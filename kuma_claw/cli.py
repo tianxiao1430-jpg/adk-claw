@@ -30,10 +30,7 @@ console = Console()
 def print_banner():
     """打印 Banner"""
     console.print(Panel.fit(
-        f"[bold cyan]🦞 {i18n.t('banner_title')}[/bold cyan]
-
-"
-        f"[dim]{i18n.t('banner_desc')}[/dim]",
+        f"[bold cyan]🦞 {i18n.t('banner_title')}[/bold cyan]\n\n[dim]{i18n.t('banner_desc')}[/dim]",
         border_style="cyan"
     ))
 
@@ -179,13 +176,8 @@ def init(non_interactive: bool):
 
     console.print()
     console.print(Panel.fit(
-        f"[green]{i18n.t('init_done')}[/green]
-
-"
-        f"[cyan]{i18n.t('next_step')}[/cyan]
-"
-        f"  [bold]kuma-claw run --web[/bold]      {i18n.t('start_web')}
-"
+        f"[green]{i18n.t('init_done')}[/green]\n\n[cyan]{i18n.t('next_step')}[/cyan]\n"
+        f"  [bold]kuma-claw run --web[/bold]      {i18n.t('start_web')}\n"
         f"  [bold]kuma-claw run --telegram[/bold] {i18n.t('start_tg')}",
         title=i18n.t("success"),
         border_style="green"
