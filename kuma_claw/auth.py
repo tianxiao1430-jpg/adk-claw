@@ -7,10 +7,12 @@ import os
 import json
 import webbrowser
 import secrets
+import threading
 from pathlib import Path
 from typing import Optional, Dict
 from datetime import datetime, timedelta
-from urllib.parse import urlencode, urlparse, parse_qs
+from urllib.parse import urlencode, urlparse, parse_qs, parse_qsl
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 import httpx
 
@@ -200,13 +202,82 @@ class OAuthFlow:
             是否成功启动
         """
         auth_url = self.get_authorization_url()
+        
+        # 创建回调接收器
+        callback_received = {"code": None, "error": None}
+        server_ready = threading.Event()
+        
+        class OAuthCallbackHandler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                parsed = urlparse(self.path)
+                if parsed.path == "/oauth/callback":
+                    params = dict(parse_qsl(parsed.query))
+                    if "code" in params:
+                        callback_received["code"] = params["code"]
+                        self.send_response(200)
+                        self.send_header("Content-type", "text/html")
+                        self.end_headers()
+                        self.wfile.write("<html><body><h1>✅ 授权成功！</h1><p>您可以关闭此页面，返回 CLI 继续操作。</p></body></html>".encode("utf-8"))
+                    elif "error" in params:
+                        callback_received["error"] = params["error"]
+                        self.send_response(200)
+                        self.send_header("Content-type", "text/html")
+                        self.end_headers()
+                        self.wfile.write(f"<html><body><h1>❌ 授权失败</h1><p>Error: {params['error']}</p></body></html>".encode("utf-8"))
+                    else:
+                        self.send_response(400)
+                        self.end_headers()
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+            
+            def log_message(self, format, *args):
+                pass  # 静默日志
+        
+        # 启动临时服务器
+        server = HTTPServer(("localhost", self.redirect_port), OAuthCallbackHandler)
+        server.timeout = 300  # 5 分钟超时
+        
+        def run_server():
+            server_ready.set()
+            server.handle_request()  # 只处理一次请求
+        
+        server_thread = threading.Thread(target=run_server, daemon=True)
+        server_thread.start()
+        
+        # 等待服务器启动
+        server_ready.wait(timeout=5)
+        
         print(f"\n🌐 正在打开浏览器进行授权...")
         print(f"   如果浏览器没有自动打开，请访问：")
         print(f"   {auth_url}\n")
-
+        
         # 打开浏览器
         webbrowser.open(auth_url)
-        return True
+        
+        # 等待回调
+        print("[dim]等待授权完成...（最多 5 分钟）[/dim]")
+        server_thread.join(timeout=300)
+        
+        if callback_received["error"]:
+            print(f"\n[red]❌ 授权失败：{callback_received['error']}[/red]")
+            return False
+        elif callback_received["code"]:
+            print(f"\n[green]✅ 授权成功！正在换取 Token...[/green]")
+            # 用 code 换取 tokens
+            tokens = self.exchange_code_for_tokens(callback_received["code"])
+            # 保存 tokens
+            from .auth import token_manager
+            token_manager.save_google_tokens(
+                access_token=tokens["access_token"],
+                refresh_token=tokens.get("refresh_token", ""),
+                expires_in=tokens["expires_in"]
+            )
+            print(f"[green]✅ Token 已保存[/green]")
+            return True
+        else:
+            print(f"\n[yellow]⚠️  授权超时，请重试[/yellow]")
+            return False
 
 
 # ============================================
