@@ -1,383 +1,183 @@
-# Kuma Claw 🦞
+# Kuma Claw Skills 系统交付包
 
-> **Native Google ADK Agent Platform**
-> **基于原生 Google ADK 的 AI Agent 平台**
-> **ネイティブ Google ADK エージェントプラットフォーム**
+> 🦞 模块化 Skills 系统 + 第一个官方 Skill（skill-creator）
 
-[English](#english) | [中文](#中文) | [日本語](#日本語)
+## 📦 包含内容
+
+### 🎯 核心系统
+- **kuma-skills-system.skill** (10KB) - Skills 系统本身
+- **skill-creator/** - 第一个官方 skill（创建和管理 skills）
+
+### 📚 文档
+- **DELIVERY.md** - 最终交付总结（推荐先读）
+- **SUMMARY.md** - 完成总结
+- **QUICK_REFERENCE.md** - 快速参考卡
+- **SKILLS_README.md** - 完整文档
+- **INTEGRATION_GUIDE.md** - 集成步骤
+- **SKILLS_DESIGN.md** - 设计方案
+
+### 🧪 测试
+- **test_skills.py** - 自动化测试脚本
+
+### 📦 打包文件
+- **kuma-skills-system.skill** - 单独的 skill 文件
+- **kuma-skills-system-with-creator.tar.gz** - 完整交付包（37KB）
+
+## 🚀 快速开始
+
+### 1. 查看交付总结
+```bash
+cat DELIVERY.md
+```
+
+### 2. 快速参考
+```bash
+cat QUICK_REFERENCE.md
+```
+
+### 3. 集成到项目
+```bash
+# 按照 INTEGRATION_GUIDE.md 的步骤操作
+cat INTEGRATION_GUIDE.md
+```
+
+### 4. 测试
+```bash
+python3 test_skills.py
+```
+
+## 🎯 skill-creator 快速测试
+
+### 方法 1：直接调用
+```python
+from kuma_claw.skills.skill_creator.tools import init_skill
+
+result = init_skill(skill_name="test-skill")
+print(result)
+```
+
+### 方法 2：通过自然语言（集成后）
+```
+用户: "创建一个skill叫my-skill"
+→ 自动触发 skill-creator
+→ 调用 init_skill(skill_name="my-skill")
+```
+
+## 📁 目录结构
+
+```
+.
+├── DELIVERY.md                          # 📋 交付总结
+├── SUMMARY.md                           # 📊 完成总结
+├── QUICK_REFERENCE.md                   # ⚡ 快速参考
+├── SKILLS_README.md                     # 📖 完整文档
+├── INTEGRATION_GUIDE.md                 # 🔧 集成指南
+├── SKILLS_DESIGN.md                     # 📐 设计方案
+├── README.md                            # 📄 本文件
+├── test_skills.py                       # 🧪 测试脚本
+├── kuma-skills-system.skill             # 📦 Skill 文件
+├── kuma-skills-system-with-creator.tar.gz # 📦 完整包
+└── kuma_claw/skills/
+    ├── skill-creator/                   # 🎯 第一个 skill
+    │   ├── skill.json
+    │   ├── tools.py
+    │   ├── prompts.py
+    │   ├── __init__.py
+    │   └── README.md
+    └── kuma-skills-system/              # ⚙️ Skills 系统
+        ├── SKILL.md
+        ├── scripts/
+        │   ├── skill_manager.py
+        │   └── init_skill.py
+        └── references/
+            ├── skill_schema.md
+            └── example_weather_skill/
+```
+
+## 🎓 学习路径
+
+### 初学者
+1. 阅读 **DELIVERY.md** 了解整体
+2. 阅读 **QUICK_REFERENCE.md** 快速上手
+3. 运行 **test_skills.py** 验证安装
+4. 使用 **skill-creator** 创建第一个 skill
+
+### 开发者
+1. 阅读 **SKILLS_README.md** 了解 API
+2. 阅读 **INTEGRATION_GUIDE.md** 集成到项目
+3. 阅读 **skill_schema.md** 了解格式规范
+4. 查看 **example_weather_skill** 学习示例
+
+### 架构师
+1. 阅读 **SKILLS_DESIGN.md** 了解设计思路
+2. 研究 **skill_manager.py** 实现细节
+3. 分析 **Progressive Disclosure** 机制
+4. 评估扩展性和性能
+
+## 💡 核心特性
+
+### ✅ 已实现
+- [x] Skills 系统核心
+- [x] 第一个官方 skill（skill-creator）
+- [x] 自动发现和加载
+- [x] 触发词智能匹配
+- [x] 渐进式加载
+- [x] 类型安全
+- [x] 完善的文档
+- [x] 自动化测试
+- [x] 打包和分发
+
+### 🔮 未来规划
+- [ ] 更多官方 skills
+- [ ] Skill Hub 在线市场
+- [ ] 远程 skill 安装
+- [ ] 热重载机制
+- [ ] 可视化编辑器
+
+## 🤝 贡献
+
+欢迎贡献：
+- 新的 skills
+- 文档改进
+- Bug 修复
+- 功能建议
+
+## 📄 许可证
+
+Apache License 2.0
+
+## 📞 支持
+
+遇到问题？
+1. 查看 **QUICK_REFERENCE.md** 的常见问题
+2. 阅读 **SKILLS_README.md** 的详细说明
+3. 参考 **INTEGRATION_GUIDE.md** 的集成步骤
+4. 运行 **test_skills.py** 诊断问题
 
 ---
 
-<a name="english"></a>
-## English
-
-### Native Google ADK Agent Platform
-
-Kuma Claw is an open-source AI agent platform built on native Google Agent Development Kit (ADK). Designed for seamless integration with Google Workspace and Google Cloud Platform.
-
-### ✨ Key Features
-
-#### 🚀 Native ADK Advantages
-- **100% Native ADK** - Built on Google's official Agent Development Kit
-- **Google Workspace Integration** - Native support for Gmail, Calendar, Sheets, Docs
-- **GCP Optimized** - Seamless deployment on Cloud Run, Vertex AI integration
-- **Multi-Model Support** - Gemini / GPT / Claude / DeepSeek / Ollama
-- **Multi-Channel** - Slack / Telegram (more coming soon)
-- **Zero Configuration** - One-click OAuth for Google Workspace
-
-#### 🔗 Google Ecosystem Integration
-
-**Google Workspace (One-Click Setup)**
-```
-✅ Gmail          - Send, read, compose emails
-✅ Calendar       - Manage events and schedules
-✅ Sheets         - Read and write spreadsheets
-✅ Docs           - Create and edit documents
-✅ Drive          - Access files and folders
-```
-
-**Google Cloud Platform**
-```
-✅ Cloud Run      - One-command deployment
-✅ Vertex AI      - Native memory and RAG services
-✅ BigQuery       - Data analytics integration
-✅ Cloud Storage  - Artifact and file storage
-```
-
-#### 💡 Why Kuma Claw?
-
-| Feature | Kuma Claw | Traditional Frameworks |
-|---------|----------|----------------------|
-| **Google ADK Native** | ✅ 100% Native | ❌ Custom implementations |
-| **Google Workspace** | ✅ One-click OAuth | ⚠️ Manual configuration |
-| **GCP Deployment** | ✅ Optimized | ⚠️ Generic |
-| **Memory Services** | ✅ Vertex AI RAG | ⚠️ Third-party DBs |
-| **Multi-Model** | ✅ 100+ models | ⚠️ Limited |
-
-### 🚀 Quick Start
-
+**开始使用：**
 ```bash
-# Install
-pip install kuma-claw
+# 1. 查看交付总结
+cat DELIVERY.md
 
-# Initialize
-kuma-claw init
+# 2. 快速参考
+cat QUICK_REFERENCE.md
 
-# Start
-kuma-claw run --telegram
+# 3. 集成并测试
+python3 test_skills.py
 ```
 
-### 📦 Deployment Options
-
-#### Option A: Local Deployment (Free)
-```bash
-# Local SQLite + FileArtifactService
-python3.10 -m kuma_claw.cli run --telegram
+**创建你的第一个 skill：**
+```python
+from kuma_claw.skills.skill_creator.tools import init_skill
+result = init_skill(skill_name="my-first-skill")
+print(result)
 ```
-- **Cost**: $0
-- **Storage**: SQLite (persistent)
-- **Privacy**: Data stays local
-
-#### Option B: Cloud Deployment (GCP Native)
-```bash
-# Cloud Run + Vertex AI Memory Bank
-gcloud run deploy kuma-claw --source .
-```
-- **Cost**: ~$6-15/month
-- **Storage**: Vertex AI Memory Bank
-- **Features**: Semantic search, auto-scaling
-
-### 🎯 Use Cases
-
-1. **Personal Assistant** - Email, calendar, task management
-2. **Team Collaboration** - Shared workspace automation
-3. **Data Analysis** - BigQuery + Sheets integration
-4. **Customer Support** - Gmail + Calendar scheduling
-5. **Content Creation** - Docs + Drive integration
 
 ---
 
-<a name="中文"></a>
-## 中文
-
-### 原生 Google ADK Agent 平台
-
-Kuma Claw 是基于原生 Google Agent Development Kit (ADK) 的开源 AI Agent 平台。专为 Google Workspace 和 Google Cloud Platform 深度集成而设计。
-
-### ✨ 核心优势
-
-#### 🚀 原生 ADK 优势
-- **100% 原生 ADK** - 基于 Google 官方 Agent Development Kit
-- **Google Workspace 集成** - 原生支持 Gmail、Calendar、Sheets、Docs
-- **GCP 优化** - 在 Cloud Run 上无缝部署，Vertex AI 集成
-- **多模型支持** - Gemini / GPT / Claude / DeepSeek / Ollama
-- **多渠道** - Slack / Telegram（更多即将推出）
-- **零配置** - Google Workspace 一键 OAuth
-
-#### 🔗 Google 生态集成
-
-**Google Workspace（一键配置）**
-```
-✅ Gmail          - 发送、读取、撰写邮件
-✅ Calendar       - 管理事件和日程
-✅ Sheets         - 读写电子表格
-✅ Docs           - 创建和编辑文档
-✅ Drive          - 访问文件和文件夹
-```
-
-**Google Cloud Platform**
-```
-✅ Cloud Run      - 一键部署
-✅ Vertex AI      - 原生记忆和 RAG 服务
-✅ BigQuery       - 数据分析集成
-✅ Cloud Storage  - 文件和存储
-```
-
-#### 💡 为什么选择 Kuma Claw？
-
-| 特性 | Kuma Claw | 传统框架 |
-|------|----------|---------|
-| **原生 Google ADK** | ✅ 100% 原生 | ❌ 自定义实现 |
-| **Google Workspace** | ✅ 一键 OAuth | ⚠️ 手动配置 |
-| **GCP 部署** | ✅ 优化 | ⚠️ 通用 |
-| **记忆服务** | ✅ Vertex AI RAG | ⚠️ 第三方数据库 |
-| **多模型** | ✅ 100+ 模型 | ⚠️ 有限 |
-
-### 🚀 快速开始
-
-```bash
-# 安装
-pip install kuma-claw
-
-# 初始化
-kuma-claw init
-
-# 启动
-kuma-claw run --telegram
-```
-
-### 📦 部署方案
-
-#### 方案 A：本地部署（免费）
-```bash
-# SQLite + FileArtifactService
-python3.10 -m kuma_claw.cli run --telegram
-```
-- **费用**：¥0
-- **存储**：SQLite（持久化）
-- **隐私**：数据本地保存
-
-#### 方案 B：云端部署（GCP 原生）
-```bash
-# Cloud Run + Vertex AI Memory Bank
-gcloud run deploy kuma-claw --source .
-```
-- **费用**：约 ¥40-100/月
-- **存储**：Vertex AI Memory Bank
-- **特性**：语义搜索、自动扩容
-
-### 🎯 应用场景
-
-1. **个人助理** - 邮件、日程、任务管理
-2. **团队协作** - 共享工作区自动化
-3. **数据分析** - BigQuery + Sheets 集成
-4. **客户支持** - Gmail + 日程安排
-5. **内容创作** - Docs + Drive 集成
-
----
-
-<a name="日本語"></a>
-## 日本語
-
-### ネイティブ Google ADK エージェントプラットフォーム
-
-Kuma Claw は、ネイティブ Google Agent Development Kit (ADK) で構築されたオープンソース AI エージェントプラットフォームです。Google Workspace と Google Cloud Platform とのシームレスな統合を実現。
-
-### ✨ 主な特徴
-
-#### 🚀 ネイティブ ADK の利点
-- **100% ネイティブ ADK** - Google公式 Agent Development Kit ベース
-- **Google Workspace 統合** - Gmail、Calendar、Sheets、Docs をネイティブサポート
-- **GCP 最適化** - Cloud Run でのシームレスなデプロイ、Vertex AI 統合
-- **マルチモデル対応** - Gemini / GPT / Claude / DeepSeek / Ollama
-- **マルチチャンネル** - Slack / Telegram（今後さらに追加）
-- **ゼロ設定** - Google Workspace のワンクリック OAuth
-
-#### 🔗 Google エコシステム統合
-
-**Google Workspace（ワンクリック設定）**
-```
-✅ Gmail          - メールの送信、読み取り、作成
-✅ Calendar       - イベントとスケジュール管理
-✅ Sheets         - スプレッドシートの読み書き
-✅ Docs           - ドキュメントの作成と編集
-✅ Drive          - ファイルとフォルダへのアクセス
-```
-
-**Google Cloud Platform**
-```
-✅ Cloud Run      - ワンコマンドデプロイ
-✅ Vertex AI      - ネイティブメモリと RAG サービス
-✅ BigQuery       - データ分析統合
-✅ Cloud Storage  - アーティファクトとファイルストレージ
-```
-
-#### 💡 なぜ Kuma Claw？
-
-| 機能 | Kuma Claw | 従来のフレームワーク |
-|------|----------|-------------------|
-| **ネイティブ Google ADK** | ✅ 100% ネイティブ | ❌ カスタム実装 |
-| **Google Workspace** | ✅ ワンクリック OAuth | ⚠️ 手動設定 |
-| **GCP デプロイ** | ✅ 最適化 | ⚠️ 汎用 |
-| **メモリサービス** | ✅ Vertex AI RAG | ⚠️ サードパーティ DB |
-| **マルチモデル** | ✅ 100+ モデル | ⚠️ 限定 |
-
-### 🚀 クイックスタート
-
-```bash
-# インストール
-pip install kuma-claw
-
-# 初期化
-kuma-claw init
-
-# 起動
-kuma-claw run --telegram
-```
-
-### 📦 デプロイオプション
-
-#### オプション A：ローカルデプロイ（無料）
-```bash
-# SQLite + FileArtifactService
-python3.10 -m kuma_claw.cli run --telegram
-```
-- **コスト**：¥0
-- **ストレージ**：SQLite（永続化）
-- **プライバシー**：データはローカル
-
-#### オプション B：クラウドデプロイ（GCP ネイティブ）
-```bash
-# Cloud Run + Vertex AI Memory Bank
-gcloud run deploy kuma-claw --source .
-```
-- **コスト**：約 $6-15/月
-- **ストレージ**：Vertex AI Memory Bank
-- **機能**：セマンティック検索、自動スケーリング
-
-### 🎯 ユースケース
-
-1. **パーソナルアシスタント** - メール、カレンダー、タスク管理
-2. **チームコラボレーション** - 共有ワークスペース自動化
-3. **データ分析** - BigQuery + Sheets 統合
-4. **カスタマーサポート** - Gmail + カレンダー予約
-5. **コンテンツ作成** - Docs + Drive 統合
-
----
-
-## CLI Commands / CLI 命令 / CLI コマンド
-
-| Command | Description | 说明 | 説明 |
-|---------|-------------|------|------|
-| `kuma-claw init` | Initialize configuration | 初始化配置 | 初期化 |
-| `kuma-claw config` | Configuration wizard | 配置向导 | 設定ウィザード |
-| `kuma-claw doctor` | Health check | 健康检查 | ヘルスチェック |
-| `kuma-claw run` | Start services | 启动服务 | サービス起動 |
-| `kuma-claw oauth-status` | Check OAuth status | 查看 OAuth 状态 | OAuth 状態確認 |
-
-## Supported Models / 支持的模型 / 対応モデル
-
-### Gemini 3.1 (Latest)
-- `gemini-3.1-pro` - Most intelligent
-- `gemini-3.1-flash` - Fast and efficient (Recommended)
-- `gemini-3.1-flash-lite-preview` - Ultra-low cost
-
-### Gemini 3 (Preview)
-- `gemini-3-pro` - Advanced multimodal understanding
-- `gemini-3-flash` - Excellent performance at low cost
-
-### Other Providers
-- **OpenAI**: GPT-4.1, GPT-4o, O3-mini
-- **Anthropic**: Claude 3.7 Sonnet, Claude 3.5 Sonnet
-- **DeepSeek**: DeepSeek Chat, DeepSeek Reasoner
-- **Local**: Ollama (Llama 3.3, Qwen 2.5, Gemma 3)
-
-## Architecture / 架构 / アーキテクチャ
-
-```
-┌─────────────────────────────────────────────┐
-│  CLI (kuma-claw init/config/run)             │
-└────────────────┬────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────┐
-│  Web UI (localhost:8080)                    │
-│  - OAuth Configuration                      │
-│  - Google Workspace Setup                   │
-└────────────────┬────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────┐
-│  Kuma Claw Core (Native ADK)                 │
-│  - Google ADK Agent                         │
-│  - Multi-Channel Adapters                   │
-│  - Google Workspace Tools                   │
-└────────┬────────────────────┬───────────────┘
-         ↓                    ↓
-    Slack (Socket)      Telegram (Polling)
-         ↓                    ↓
-┌─────────────────────────────────────────────┐
-│  Google Services                            │
-│  - Gmail / Calendar / Sheets / Docs         │
-│  - Vertex AI Memory Bank                    │
-│  - Cloud Storage                            │
-└─────────────────────────────────────────────┘
-```
-
-## Development / 开发 / 開発
-
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Code formatting
-ruff format .
-
-# Type checking
-mypy .
-```
-
-## Contributing / 贡献 / 貢献
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## License / 许可证 / ライセンス
-
-**Apache License 2.0** - See [LICENSE](LICENSE)
-
-Copyright 2024 Kuma Claw Contributors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-
-**What you can do / 你可以做的 / できること:**
-- ✅ Commercial use / 商业使用 / 商用利用
-- ✅ Modify / 修改 / 改変
-- ✅ Distribute / 分发 / 配布
-- ✅ Private use / 私人使用 / 私的利用
-- ✅ Sublicense / 再许可 / サブライセンス
-
-**What you must do / 你必须做的 / しなければならないこと:**
-- ✅ Preserve copyright notice / 保留版权声明 / 著作権表示の保持
-- ✅ Include copy of license / 包含许可证副本 / ライセンスのコピーを含める
-- ✅ State changes / 说明改动 / 変更点の記載
-
-**What you cannot do / 你不能做的 / できないこと:**
-- ❌ Hold liable / 追究责任 / 責任を追及
-- ❌ Use trademarks / 使用商标 / 商標の使用
-
----
-
-**Kuma Claw** - Native Google ADK Agent Platform 🦞  
-**Kuma Claw** - 原生 Google ADK Agent 平台 🦞  
-**Kuma Claw** - ネイティブ Google ADK エージェントプラットフォーム 🦞
+**版本**: v1.0
+**日期**: 2026-03-12
+**作者**: OpenClaw Assistant (简)
+**状态**: ✅ 交付完成

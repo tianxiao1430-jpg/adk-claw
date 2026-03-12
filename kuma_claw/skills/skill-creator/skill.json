@@ -1,0 +1,81 @@
+{
+  "name": "skill-creator",
+  "version": "1.0.0",
+  "description": "创建、验证和打包 kuma-claw skills。使用场景：(1) 初始化新 skill 结构，(2) 验证 skill 配置，(3) 打包 skill 为可分发文件，(4) 设计 skill 触发词和工具",
+  "triggers": [
+    "创建skill",
+    "新建skill",
+    "skill创建",
+    "create skill",
+    "skill-creator",
+    "skill creator",
+    "初始化skill",
+    "开发skill",
+    "编写skill",
+    "验证skill",
+    "打包skill",
+    "skill开发",
+    "skill设计"
+  ],
+  "author": "kuma-claw-team",
+  "dependencies": [],
+  "tools": [
+    {
+      "name": "init_skill",
+      "description": "初始化新 skill 的目录结构和文件（skill.json, tools.py, prompts.py, __init__.py）",
+      "parameters": {
+        "skill_name": {
+          "type": "string",
+          "description": "Skill 名称（小写字母、数字、连字符，最多64字符）",
+          "required": true
+        },
+        "skills_dir": {
+          "type": "string",
+          "description": "Skills 目录路径（默认 kuma_claw/skills）",
+          "required": false,
+          "default": "kuma_claw/skills"
+        }
+      }
+    },
+    {
+      "name": "validate_skill",
+      "description": "验证 skill 结构和配置是否正确（检查必需文件、JSON格式、必需字段）",
+      "parameters": {
+        "skill_name": {
+          "type": "string",
+          "description": "要验证的 skill 名称",
+          "required": true
+        },
+        "skills_dir": {
+          "type": "string",
+          "description": "Skills 目录路径",
+          "required": false,
+          "default": "kuma_claw/skills"
+        }
+      }
+    },
+    {
+      "name": "package_skill",
+      "description": "打包 skill 为可分发的 .skill 文件（zip格式）",
+      "parameters": {
+        "skill_name": {
+          "type": "string",
+          "description": "要打包的 skill 名称",
+          "required": true
+        },
+        "output_dir": {
+          "type": "string",
+          "description": "输出目录（默认当前目录）",
+          "required": false,
+          "default": "."
+        },
+        "skills_dir": {
+          "type": "string",
+          "description": "Skills 目录路径",
+          "required": false,
+          "default": "kuma_claw/skills"
+        }
+      }
+    }
+  ]
+}
