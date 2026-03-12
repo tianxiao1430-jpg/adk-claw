@@ -81,6 +81,12 @@ class SlackChannel(ChannelHandler):
             # 移除 bot mention
             text = re.sub(r"<@[^>]+>", "", text).strip()
 
+            # 构造 session_key（按线程隔离）
+            # 格式："{user_id}:{channel}:{thread_ts}"
+            session_key = f"{user_id}:{channel}:{thread_ts}"
+
+            logger.debug(f"Slack 消息: user={user_id}, channel={channel}, thread={thread_ts}, session_key={session_key}")
+
             # 提取图片（如果有）
             files = event.get("files", [])
             images: List[Tuple[bytes, str]] = []
@@ -104,12 +110,13 @@ class SlackChannel(ChannelHandler):
                                 thread_ts=thread_ts
                             )
 
-            # 处理消息
+            # 处理消息（传入 session_key）
             try:
                 response = await self.run_agent(
                     user_id=user_id,
                     text=text,
                     images=images if images else None,
+                    session_key=session_key  # ← 关键：按线程隔离
                 )
 
                 # 提取内部内容
