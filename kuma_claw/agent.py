@@ -125,28 +125,62 @@ def get_memory_stats() -> str:
 
 def web_search(query: str, limit: int = 5) -> str:
     """通过 DuckDuckGo 搜索网络获取实时信息
-    
+
     Args:
         query: 搜索关键词
         limit: 返回的结果数量上限
-        
+
     Returns:
         包含标题、摘要和链接的搜索结果文本
     """
     try:
-        from duckduckgo_search import DDGS
-        results = []
-        with DDGS() as ddgs:
-            for r in ddgs.text(query, max_results=limit):
-                results.append(f"标题: {r.get('title')}\n内容: {r.get('body')}\n链接: {r.get('href')}")
-        
+        # 优先使用新包 ddgs
+        try:
+            from ddgs import DDGS
+            logger.debug("使用 ddgs 包（新）")
+
+            # 新包：直接返回 list
+            with DDGS() as ddgs:
+                results_raw = ddgs.text(query, max_results=limit)
+
+            results = []
+            for r in results_raw:
+                results.append(
+                    f"标题: {r.get('title')}\n"
+                    f"内容: {r.get('body')}\n"
+                    f"链接: {r.get('href')}"
+                )
+
+        except ImportError:
+            # 备选：旧包 duckduckgo_search
+            try:
+                from duckduckgo_search import DDGS
+                logger.debug("使用 duckduckgo-search 包（旧）")
+
+                # 旧包：需要 with 语句
+                results = []
+                with DDGS() as ddgs:
+                    for r in ddgs.text(query, max_results=limit):
+                        results.append(
+                            f"标题: {r.get('title')}\n"
+                            f"内容: {r.get('body')}\n"
+                            f"链接: {r.get('href')}"
+                        )
+
+            except ImportError:
+                return (
+                    "❌ 搜索功能不可用：未安装搜索库\n"
+                    "安装新包: pip install ddgs>=9.0.0\n"
+                    "或旧包: pip install duckduckgo-search"
+                )
+
         if not results:
             return f"没有找到关于 '{query}' 的搜索结果。"
-            
+
         return "\n\n".join(results)
-    except ImportError:
-        return "❌ 搜索功能不可用：未安装 duckduckgo-search 库\n安装: pip install duckduckgo-search"
+
     except Exception as e:
+        logger.error(f"搜索失败: {str(e)}")
         return f"搜索失败: {str(e)}"
 
 
@@ -156,7 +190,7 @@ def web_search(query: str, limit: int = 5) -> str:
 
 def _load_google_workspace_toolsets():
     """加载 ADK 内置的 Google Workspace 工具集
-    
+
     Returns:
         工具集列表（失败时返回空列表）
     """
