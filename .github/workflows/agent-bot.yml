@@ -1,0 +1,56 @@
+# .github/workflows/agent-bot.yml
+# OpenClaw Bot - GitHub Issue 评论触发
+# 用法：在 Issue 下评论 @claw [你的指令]
+
+name: OpenClaw Bot
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    # 只处理包含 @claw 的评论
+    if: contains(github.event.comment.body, '@claw')
+    
+    steps:
+      - name: Extract Prompt
+        id: prompt
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          # 去掉 @claw 得到纯 Prompt
+          PROMPT=$(echo "$COMMENT" | sed 's/@claw//' | xargs)
+          
+          echo "text<<EOF" >> $GITHUB_OUTPUT
+          echo "$PROMPT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Send to OpenClaw
+        run: |
+          curl -X POST "${{ vars.OPENCLAW_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.OPENCLAW_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "event": "mention",
+              "repository": "${{ github.repository }}",
+              "issue_number": ${{ github.event.issue.number }},
+              "issue_title": "${{ github.event.issue.title }}",
+              "issue_body": ${{ toJSON(github.event.issue.body) }},
+              "prompt": ${{ toJSON(steps.prompt.outputs.text) }},
+              "commenter": "${{ github.event.comment.user.login }}",
+              "comment_url": "${{ github.event.comment.html_url }}"
+            }'
+      
+      - name: Confirm Received
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '👌 已收到，Claw 正在处理...'
+            })
